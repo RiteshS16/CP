@@ -1,0 +1,77 @@
+#include<bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+// using namespace __gnu_pbds;
+using namespace std;
+
+struct StringHash{
+    const long long int base1=29;
+    const long long int base2=31;
+    const long long int prime1=1e9+7;
+    const long long int prime2=1e9+19;
+    vector<long long int>v1,v2,pw1,pw2;
+    StringHash(string s)
+    {
+        string ss=s;
+        int n=s.length();
+        v1.resize(n);
+        v2.resize(n);
+        pw1.resize(n);
+        pw2.resize(n);
+        for(int i=0;i<n;i++)
+        {
+            if(i==0)
+            {
+                v1[i]=s[i]-'a'+1;
+                pw1[i]=1;
+                v2[i]=s[i]-'a'+1;
+                pw2[i]=1;
+                continue;
+            }
+            v1[i] = (v1[i-1]*base1 + s[i]-'a'+1)%prime1;
+            pw1[i]=pw1[i-1]*base1;
+            pw1[i]%=prime1;
+            
+            v2[i] = (v2[i-1]*base2 + s[i]-'a'+1)%prime2;
+            pw2[i]=pw2[i-1]*base2;
+            pw2[i]%=prime2;
+        }
+    }
+    
+    pair<long long int,long long int> getHash(int l,int r)
+    {
+        long long int hashvalue1,hashvalue2;
+        
+        hashvalue1=(l-1>=0 ? (v1[r]-(v1[l-1]*pw1[r-l+1])%prime1+prime1)%prime1 : v1[r]);
+        hashvalue2=(l-1>=0 ? (v2[r]-(v2[l-1]*pw2[r-l+1])%prime2+prime2)%prime2 : v2[r]);
+        
+        return {hashvalue1,hashvalue2};
+    }
+};
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    string n,m;
+    cin>>n>>m;
+    int lenN=n.length();
+    int lenM=m.length();
+    StringHash H1=StringHash(n);
+    // cout<<H1.v1[n.length()-1]<<" "<<H1.v2[n.length()-1]<<endl;
+    StringHash H2=StringHash(m);
+    // cout<<H2.v1[m.length()-1]<<" "<<H2.v2[m.length()-1]<<endl;
+    pair<long long int,long long int> hashesM = H2.getHash(0,lenM-1);
+    long long int ans=0;
+    for(int i=0;i+lenM-1<lenN;i++)
+    {
+        pair<long long int,long long int> hashesN = H1.getHash(i,i+lenM-1);
+        if(hashesN==hashesM)
+        ans++;
+    }
+    
+    cout<<ans<<endl;
+    
+    
+    return 0;
+}
