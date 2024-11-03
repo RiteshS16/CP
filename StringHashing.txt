@@ -5,8 +5,8 @@
 using namespace std;
 
 struct StringHash{
-    const long long int base1=29;
-    const long long int base2=31;
+    const long long int base1=5689;
+    const long long int base2=8861;
     const long long int prime1=1e9+7;
     const long long int prime2=1e9+19;
     vector<long long int>v1,v2,pw1,pw2;
