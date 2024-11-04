@@ -35,7 +35,7 @@ public:
             current_word=trie_tree[current_word].children[word[i]-'a'];
         }
         trie_tree[current_word].string_ending_here++;
-        trie_tree[current_word].strings_below_this++;
+        //trie_tree[current_word].strings_below_this++;
 
     }
     
