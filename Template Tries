@@ -1,0 +1,63 @@
+//Tries Implementation
+struct Node{
+    vector<int> children;
+    int string_ending_here=0;
+    int strings_below_this=0;
+    Node(int len)
+    {
+        children.resize(len,-1);
+    }
+};
+class Trie {
+    vector<Node> trie_tree;
+    int trie_size=0;
+public:
+    Trie() {
+        Node N=Node(26);
+        trie_tree.push_back(N);
+        trie_size++;
+        // trie_tree.emplace_back();
+    }
+    
+    void insert(string word) {
+        int current_word=0;
+        
+        for(int i=0;i<word.length();i++)
+        {
+            if(trie_tree[current_word].children[word[i]-'a']==-1)
+            {
+                trie_tree[current_word].children[word[i]-'a']=trie_size;
+                Node nd=Node(26);
+                trie_tree.push_back(nd);
+                trie_size++;
+            }
+            trie_tree[current_word].strings_below_this++;
+            current_word=trie_tree[current_word].children[word[i]-'a'];
+        }
+        trie_tree[current_word].string_ending_here++;
+        trie_tree[current_word].strings_below_this++;
+
+    }
+    
+    bool search(string word) {
+        int current_word=0;
+        for(int i=0;i<word.length();i++)
+        {
+            if(trie_tree[current_word].children[word[i]-'a']==-1)
+            return false;
+            current_word=trie_tree[current_word].children[word[i]-'a'];
+        }
+        return trie_tree[current_word].string_ending_here>0;
+    }
+    
+    bool startsWith(string prefix) {
+        int current_word=0;
+        for(int i=0;i<prefix.length();i++)
+        {
+            if(trie_tree[current_word].children[prefix[i]-'a']==-1)
+            return false;
+            current_word=trie_tree[current_word].children[prefix[i]-'a'];
+        }
+        return trie_tree[current_word].strings_below_this>0;
+    }
+};
