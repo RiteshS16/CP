@@ -1,0 +1,120 @@
+//{ Driver Code Starts
+// Initial Template for C++
+
+#include <bits/stdc++.h>
+using namespace std;
+
+// } Driver Code Ends
+// User function Template for C++
+struct Node{
+    vector<int> children;
+    int string_below_this=0;
+    int string_ending_here=0;
+    Node(int len)
+    {
+        children.resize(len,-1);
+    }
+};
+class Trie{
+    vector<Node> trie_tree;
+    int length=26;
+    int trie_size=0;
+    public:
+    Trie()
+    {
+        Node N=Node(length);
+        trie_tree.push_back(N);
+        trie_size++;
+    }
+    void add_string(string &s)
+    {
+        int current_node=0;
+        for(int i=0;i<s.length();i++)
+        {
+            if(trie_tree[current_node].children[s[i]-'a']==-1)
+            {
+                trie_tree[current_node].children[s[i]-'a']=trie_size;
+                trie_size++;
+                Node N=Node(length);
+                trie_tree.push_back(N);
+                trie_tree[current_node].string_below_this++;
+            }
+            current_node=trie_tree[current_node].children[s[i]-'a'];
+            trie_tree[current_node].string_below_this++;
+        }
+        trie_tree[current_node].string_ending_here++;
+    }
+    bool prefix(string &s)
+    {
+        int current_node=0;
+        for(int i=0;i<s.length();i++)
+        {
+            if(trie_tree[current_node].children[s[i]-'a']==-1)
+            {
+                return false;
+            }
+            current_node=trie_tree[current_node].children[s[i]-'a'];
+        }
+        return trie_tree[current_node].string_below_this>0;
+    }
+};
+class Solution{
+public:
+    
+    vector<vector<string>> displayContacts(int n, string contact[], string s)
+    {
+        set<string> st;
+        for(int i=0;i<n;i++)
+        st.insert(contact[i]);
+        vector<string> contacts;
+        for(auto itr=st.begin();itr!=st.end();itr++)
+        contacts.push_back(*itr);
+        vector<vector<string>> ans;
+        for(int i=0;i<s.length();i++)
+        {
+            vector<string> v;
+            for(int j=0;j<contacts.size();j++)
+            {
+                string str=contacts[j];
+                Trie T=Trie();
+                T.add_string(str);
+                string prefix=s.substr(0,i+1);
+                bool check=T.prefix(prefix);
+                if(check)
+                v.push_back(contacts[j]);
+            }
+            if(v.size()==0)
+            v.push_back("0");
+            sort(v.begin(),v.end());
+            ans.push_back(v);
+        }
+        return ans;
+    }
+};
+
+//{ Driver Code Starts.
+
+int main(){
+    int t;
+    cin>>t;
+    while(t--){
+        int n;
+        cin>>n;
+        string contact[n], s;
+        for(int i = 0;i < n;i++)
+            cin>>contact[i];
+        cin>>s;
+        
+        Solution ob;
+        vector<vector<string>> ans = ob.displayContacts(n, contact, s);
+        for(int i = 0;i < ans.size();i++){
+            for(auto u: ans[i])
+                cout<<u<<" ";
+            cout<<"\n";
+        }
+    
+cout << "~" << "\n";
+}
+    return 0;
+}
+// } Driver Code Ends
