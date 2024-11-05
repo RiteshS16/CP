@@ -1,0 +1,147 @@
+//{ Driver Code Starts
+//Initial template for C++
+
+#include<bits/stdc++.h> 
+using namespace std; 
+
+// } Driver Code Ends
+//User function Template for C++
+struct Node{
+    vector<int> children;
+    Node()
+    {
+        children.resize(2,-1);    
+    }
+    
+};
+class Trie{
+    vector<Node> trie_tree;
+    int trie_size=0;
+    public:
+    Trie()
+    {
+        Node N=Node();
+        trie_tree.push_back(N);
+        trie_size++;
+    }
+    void add_string(string&s)
+    {
+        int current_node=0;
+        for(int i=0;i<s.length();i++)
+        {
+            if(trie_tree[current_node].children[s[i]-'0']==-1)
+            {
+                trie_tree[current_node].children[s[i]-'0']=trie_size;
+                Node N=Node();
+                trie_tree.push_back(N);
+                trie_size++;
+            }
+            current_node=trie_tree[current_node].children[s[i]-'0'];
+        }
+    }
+    string maxNumber(string &s)
+    {
+        string ans="";
+        int current_node=0;
+        for(int i=0;i<s.length();i++)
+        {
+            if(s[i]=='0')
+            {
+                if(trie_tree[current_node].children[1]!=-1)
+                {
+                    ans+='1';
+                    current_node=trie_tree[current_node].children[1];
+                }
+                else
+                {
+                    ans+='0';
+                    current_node=trie_tree[current_node].children[0];
+                }
+            }
+            else
+            {
+                if(trie_tree[current_node].children[0]!=-1)
+                {
+                    ans+='1';
+                    current_node=trie_tree[current_node].children[0];
+                }
+                else
+                {
+                    ans+='0';
+                    current_node=trie_tree[current_node].children[1];
+                }
+            }
+        }
+        return ans;
+
+    }
+};
+int stringToInt(string &s)
+{
+    int val=0;
+    for(int j=0;j<s.length();j++)
+    {
+        val+=pow(2,31-j)*(s[j]-'0');
+    }
+    return val;
+}
+string intToString(int n)
+{
+    string str="";
+    for(int i=31;i>=0;i--)
+    str+=(((n&(1<<i))&&1)+'0');
+    return str;
+}
+class Solution{   
+public:
+    int maxSubarrayXOR(int N, int arr[]){    
+        Trie T=Trie();
+        vector<int> XOR(N);
+        int mxval=arr[0];
+        XOR[0]=arr[0];
+        for(int i=1;i<N;i++)
+        {
+            XOR[i]=XOR[i-1]^arr[i];
+            mxval=max(mxval,XOR[i]);
+        }
+        
+        vector<string> numbers;
+        for(int i=0;i<N;i++)
+        {
+            numbers.push_back(intToString(XOR[i]));
+            T.add_string(numbers.back());
+        }
+        
+        int val=INT_MIN;
+        for(int i=0;i<N;i++)
+        {
+            string ans=T.maxNumber(numbers[i]);
+            val=max(val,stringToInt(ans));
+        }
+        return max(mxval,val);
+    }
+};
+
+//{ Driver Code Starts.
+int main() 
+{ 
+    int t;
+    cin>>t;
+    while(t--)
+    {
+        int N, X;
+        cin >> N;
+        int arr[N];
+        for(int i = 0; i < N; i++){
+            cin >> arr[i];
+        }
+
+        Solution ob;
+        cout << ob.maxSubarrayXOR(N, arr) << endl;
+    
+cout << "~" << "\n";
+}
+    return 0; 
+} 
+
+// } Driver Code Ends
