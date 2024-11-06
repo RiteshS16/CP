@@ -1,0 +1,73 @@
+//===========================================CSES: Dice Combinations===================================================
+/*
+===================================================Question===================================================
+Your task is to count the number of ways to construct sum n by throwing a dice one or more times. 
+Each throw produces an outcome between 1 and  6.
+For example, if n=3, there are 4 ways:
+
+1+1+1
+1+2
+2+1
+3
+===================================================Question===================================================
+*/
+#include<bits/stdc++.h>
+using namespace std;
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int n;
+    int mod=1e9+7;
+    //Find number of ways in which number n can be formed by throiwing a dice any number of times.
+    cin>>n;
+    
+    //DP State => dp[i]: Number of ways in which the number i can be formed on throwing a dice.
+    
+    //Base Cases:   dp[1]=1:  Number of ways to form the numeral 1 is one. 
+    
+    //Transition:   dp[i]=dp[i-1]+dp[i-2]+dp[i-3] + dp[i-4] + dp[i-5] + dp[i-6] for i>6;
+    //              dp[i]=SUM(dp[1]...dp[i-1])+1 for 2<=i<=6;
+    
+    //Why this transition state?
+    //We know that the possible numbers that we can get on a dice throw range from [1 to 6].
+    //Hence a number i can be reached from: Number i-1(when dice throw shows a 1) i.e i-1 + 1=i,
+    //                                      Number i-2(when dice throw shows a 2) i.e i-2 + 2=i,
+    //                                      Number i-3(when dice throw shows a 3) i.e i-3 + 3=i,
+    //                                      Number i-4(when dice throw shows a 4) i.e i-4 + 4=i,
+    //                                      Number i-5(when dice throw shows a 5) i.e i-5 + 5=i and 
+    //                                      Number i-6(when dice throw shows a 6) i.e i-6 + 6=i
+    //And number of ways to form number i is=Number of ways to form number (i-1)
+    //                                                      +
+    //                                       Number of ways to form number (i-2)   
+    //                                                      +
+    //                                       Number of ways to form number (i-3)   
+    //                                                      +
+    //                                       Number of ways to form number (i-4)   
+    //                                                      +
+    //                                       Number of ways to form number (i-5)   
+    //                                                      +
+    //                                       Number of ways to form number (i-6)   
+    //Final subproblem: dp[n]
+    vector<int> dp(n+1,0);
+    dp[0]=0;//Number of ways to form numeral zero using a dice throw are 0.
+    dp[1]=1;
+    int sum=dp[1];
+    for(int i=2;i<=6;i++)
+    {
+        dp[i]=sum+1;
+        sum+=dp[i];
+    }
+    
+    if(n<=6)
+    cout<<dp[n]<<endl;
+    else
+    {
+        for(int i=7;i<=n;i++)
+        dp[i]=(((((dp[i-1]+dp[i-2])%mod+dp[i-3])%mod + dp[i-4])%mod + dp[i-5])%mod + dp[i-6])%mod;
+        cout<<dp[n]<<endl;
+    }
+    return 0;
+}
