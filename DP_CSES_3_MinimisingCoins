@@ -1,0 +1,83 @@
+//===========================================CSES: Minimising Coins===================================================
+/*
+===================================================Question===================================================
+Consider a money system consisting of n coins. Each coin has a positive integer value. Your task is to produce a 
+sum of money x using the available coins in such a way that the number of coins is minimal.
+
+For example, if the coins are {1,5,7} and the desired sum is 11, an optimal solution is 5+5+1 which 
+requires 3 coins.
+
+Input
+The first input line has two integers n and x: the number of coins and the desired sum of money.
+The second line has n distinct integers c_1,c_2,.....,c_n: the value of each coin.
+===================================================Question===================================================
+*/
+
+//Time Complexity: O(n.x)
+//Space Complexity: O(x)
+#include<bits/stdc++.h>
+using namespace std;
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int n,x;
+    //n->Number of Coins.
+    //x->Sum to be obtained.
+    cin>>n>>x;
+    
+    //Vector c stores all the n coins
+    vector<int> c(n);
+    for(int i=0;i<n;i++)
+    cin>>c[i];
+    
+    //DP State => dp[i]: Minimum number of coins required to form a sum of i from n coins.
+    
+    //Base Cases:   Initialise dp[i] = 1 for all i from 1 to x where i==c[i] as these coins are already present.
+    //For rest assign dp[i]=INT_MAX and dp[0]=0 as minimum coins required to form a sum of zero are 0.
+    
+    //Another base case could be just put dp[0]=0, that is minimum number of coins required to attain a sum of zero is 0.
+    
+    
+    //Transition:   dp[i]=min(dp[i-c[j]]+1) for j=0 to n-1 if i-c[j]>=0 ;
+    
+    //Why this transition state?
+    //We know that the possible numbers from where number i can be obtained are i-c[j] for j=0 to n-1.
+    //Hence a number i can be reached from: Number i-c[0]
+    //                                      Number i-c[1]
+    //                                      Number i-c[2] and so on until i-c[j]
+    //And minimum coins to form number i is=Minimum of (dp[i-c[0]]+1,    => dp[i-c[0]] is Minimum coins required to form number i-c[0] and +1 is done 
+    //                                                                      because dp[i]=min no of ways to get coin i-c[0] + min no of ways to get coin c[0] (which is 1).
+    //                                                      
+    //                                              dp[i-c[1]]+1,        => dp[i-c[1]] is Minimum coins required to form number i-c[1] and +1 is done 
+    //                                                                      because dp[i]=min no of ways to get coin i-c[1] + min no of ways to get coin c[1] (which is 1).
+    //                                                      
+    //                                              dp[i-c[2]]+1,        => dp[i-c[2]] is Minimum coins required to form number i-c[2] and +1 is done 
+    //                                                                      because dp[i]=min no of ways to get coin i-c[2] + min no of ways to get coin c[2] (which is 1).
+    //                                                      .
+    //                                                      .
+    //                                                      .
+    //                                                      .
+    //                                                      .
+    //                                              dp[i-c[j]]+1),       => dp[i-c[j]] is Minimum coins required to form number i-c[j] and +1 is done 
+    //                                                                      because dp[i]=min no of ways to get coin i-c[j] + min no of ways to get coin c[j] (which is 1).
+    
+    //Final subproblem: dp[x]
+    
+    vector<int> dp(x+1,1e9);
+    dp[0]=0;//No coin is required to form a sum of 0.
+    
+    for(int i=1;i<=x;i++)
+    {
+        for(int j=0;j<n;j++)
+        {
+            if(i-c[j]>=0)
+            dp[i]=min(dp[i],dp[i-c[j]]+1);
+        }
+    }
+    
+    cout<<((dp[x]>=1e9) ? -1 : dp[x])<<endl;
+    return 0;
+}
