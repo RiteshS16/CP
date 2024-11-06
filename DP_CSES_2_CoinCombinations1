@@ -35,7 +35,9 @@ int main()
     
     //DP State => dp[i]: Number of different ways in which the number i can be obtained using n coins.
     
+    
     //Base Cases:   Initialise dp[i] = 1 for all i from 1 to x where i==c[i] as these coins are already present.
+    //Base Cases:   Or another base case could be: dp[0]=1. Number of ways to form a number 0 is 1 which is by not choosing any coin.
     
     //Transition:   dp[i]+=dp[i-c[j]] for j=0 to n-1 if i-c[j]>=0 ;
     
