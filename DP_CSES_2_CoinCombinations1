@@ -14,6 +14,10 @@ For example, if the coins are {2,3,5} and the desired sum is 9, there are 8 ways
 3+2+2+2
 ===================================================Question===================================================
 */
+
+//Time Complexity: O(x.n)
+//Space Complexity: O(x)
+
 #include<bits/stdc++.h>
 using namespace std;
 
