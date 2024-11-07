@@ -36,7 +36,7 @@ int main()
     cin>>pages[i];
     
     //Intution: Aim is to maximise number of pages. 
-    //DP state: dp[i][j]: maximum number of pages till i-th book using j money.
+    //DP state: dp[i][j]: maximum number of pages till i-th book using less than or equal to j money.
     //Trainsition: dp[i][j]= max(dp[i-1][j-price[i]]+pages[i],dp[i-1][j]);
     //Base Case: dp[0][i]=0. Maximum number of pages read with 0 books 
     //           dp[i][0]=0. Maximum number of pages read with 0 money. 
