@@ -1,0 +1,92 @@
+//===========================================CSES: Coin Combinatios 2===================================================
+/*
+===================================================Question===================================================
+Consider a money system consisting of n coins. Each coin has a positive integer value. 
+Your task is to calculate the number of distinct ordered ways you can produce a money sum x 
+using the available coins.
+For example, if the coins are {2,3,5} and the desired sum is 9, there are 3 ways:
+
+2+2+5
+3+3+3
+2+2+2+3
+===================================================Question===================================================
+*/
+
+//Time Complexity: 
+//Space Complexity: 
+#include<bits/stdc++.h>
+using namespace std;
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int n,x;
+    //n->Number of coins.
+    //x-> Sum to be obtained
+    int mod=1e9+7;
+    cin>>n>>x;
+    
+    //c=> Vector stroing value of coins
+    vector<int> c(n);
+    for(int i=0;i<n;i++)
+    cin>>c[i];
+    
+    /*
+    Intuition:
+    #   For a given number 9, 2+2+2+3 is same as 2+3+2+2, ie order doesnt matter
+    #   Hence, we need to pickup the coins in such a way that the combination of coins
+        picked sould not have been picked already(in some different order).
+    #   This can be achieved if while trying to make a sum of X, I am picking up a coin c_i 
+        from n coins then I cannot pick next coin less than c_i. Next coin should be greater
+        than or equal to c_i. 
+        For example.c={2,3,5}. In case of 9, if I have picked 3 as first coin then I cannot pick 
+        2 as second coin i.e I can't do 3+2+... Second coin has to be >=3.
+        Hence, for 9 if 3 is the first coin then 2nd coin can be 3 or 5.
+        So, 9= 3+3+... or 3+5+...
+        And once we achieve the sum 9, we increment our answer.
+    */
+    
+    //DP State => dp[i][k]: Number of ways to make a sum of k using coins from c_i to c_n and 
+    //all coins before c_i are skipped.
+    
+    //Base Cases:   Initialise dp[i][0] = 1. Number of ways to form a sum=0 using coins c_i to c_n.
+    //              Or we can do dp[i][c[i]]=1 for i=0 to n-1. 
+    //              Make sure to sort the array c as we want c[i]<c[i+1] as per our logic.
+    
+    /*
+    Transition:
+    #   So, when I am at ith coin, I can do one of the following things:
+        (i)     I can either pick the ith coin and move further with the remianing sum ie k-c[i],
+        (ii)    I do not pick ith coin and move to the next coin i+1 with the sum k.    
+        And number of ways will be sum of (i) and (ii)
+    #   Hence, my transition will look like
+        dp[i][k]=dp[i][k-c[i]] + dp[i+1][k]; (pick ith coin + do not pick ith coin) 
+    */
+    
+    //Final subproblem: dp[0][x]
+    
+    //Time Complexity: O(n.x)
+    //Space Complexity: O(n.x)
+    
+    vector<vector<int>> dp(n+1,vector<int>(x+1,0));
+    for(int i=0;i<n;i++)
+    {
+        dp[i][0]=1;
+    }
+    sort(c.begin(),c.end());
+    for(int i=n-1;i>=0;i--)
+    {
+        //starting j with c[i] because when picking up the coin c[i], we cannot form a sum<c[i]
+        //because the minimum denomination available with us is c[i].
+        for(int j=c[i];j<=x;j++)
+        {
+            dp[i][j]=dp[i][j-c[i]]+dp[i+1][j];
+            dp[i][j]%=mod;
+        }
+    }
+    cout<<dp[0][x]<<endl;
+    
+    return 0;
+}
