@@ -1,0 +1,81 @@
+//===========================================CSES: Array Description===================================================
+/*
+===================================================Question===================================================
+You know that an array has n integers between 1 and  m, and the absolute difference between two adjacent 
+values is at most 1.
+Given a description of the array where some values may be unknown, your task is to count the number of 
+arrays that match the description.
+
+Input
+
+The first input line has two integers n and m: the array size and the upper bound for each value.
+The next line has n integers x_1,x_2,...,x_n: the contents of the array. Value 0 denotes an unknown value.
+===================================================Question===================================================
+*/
+
+#include<bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+// using namespace __gnu_pbds;
+using namespace std;
+ 
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int mod=1e9+7;
+    int n,m;
+    cin>>n>>m;
+    vector<long long> x(n);
+    for(int i=0;i<n;i++)
+    cin>>x[i];
+    
+    vector<vector<long long>> dp(m+1,vector<long long>(n+1,0));
+    //Intuition: 
+    //For a given index j if x[j] is 0, the possible values it can attain depends on its previous number at index x[j+1].
+    //If value at x[j+1] is i, then x[j] can take i,i+1 and i-1 values.
+    //DP state:         dp[i][j]: For a given index j holding a value i<=m, dp[i][j]= Total arrays constructed till number i after computing numbers from x[j] till  x[n].
+    // Transition:      Number at x[j] will depend on number at  x[j+1], ie if i is the number at x[j+1] then x[j] is sum of arrays formed at x[j+1] for numbers i+1, i, i-1.
+    //                  Hence, DP trainsition will be
+    //                  if(x[j]==0)
+    //                  dp[i][j]=dp[i+1][j+1]+dp[i][j+1]+dp[i-1][j-1]. =>dp[i][j]= Sum of arrays constructed at (j+1)th index when number at j+1 was (i+1), i, (i-1); 
+    //                  else
+    //                  dp[x[j]][j]=dp[x[j]+1][j+1]+dp[x[j]][j+1]+dp[x[j]-1][j+1];
+    //Base case:        if x[n-1]==0: dp[i][n-1]=1; For a single index only 1 array is possible using that number.
+    //                  else dp[x[n-1]][n-1]=1;
+    //Final Subproblem: sum of dp[i][0];
+    if(x[n-1]==0)
+    {
+        for(int i=1;i<=m;i++)   
+        dp[i][n-1]=1;    
+    }
+    else
+    {
+        dp[x[n-1]][n-1]=1;
+    }
+    for(int j=n-2;j>=0;j--)
+    {
+        for(int i=1;i<=m;i++)
+        {
+            if(x[j]==0)
+            dp[i][j] = ((i-1>=0 ? dp[i-1][j+1] : 0)+dp[i][j+1]+(i+1<=m ? dp[i+1][j+1] : 0))%mod;
+            else
+            {
+                dp[x[j]][j]=((x[j]-1>=0 ? dp[x[j]-1][j+1] : 0)+dp[x[j]][j+1]+(x[j]+1<=m ? dp[x[j]+1][j+1] : 0))%mod;
+                break;
+            }
+            
+        }
+        
+    }
+    long long int ans=0;
+    for(int i=1;i<=m;i++)
+    {
+        ans+=dp[i][0];
+        ans%=mod;
+    }
+    cout<<ans<<endl;
+    
+    return 0;
+}
