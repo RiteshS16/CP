@@ -1,0 +1,170 @@
+//===========================================AtCoder: Coins===================================================
+/*
+===================================================Question===================================================
+Problem Statement
+Let 
+N be a positive odd number.There are N coins, numbered 1,2,…,N. For each i (1≤i≤N), when Coin i is tossed, 
+it comes up heads with probability p_i and tails with probability 1−p_i
+Taro has tossed all the N coins. Find the probability of having more heads than tails.
+===================================================Question===================================================
+*/
+/*
+Intution:
+#   We need to find probability of number of heads greater than number of tails after all N tosses.
+    So we need to find Probability of getting (n/2+1) heads.
+#   Now How to approach this problem?
+    Let X=n/2+1.=> Number of heads we want.
+    So, now we have N chances in which we want X heads.
+    
+DP state=> dp[i][j]: Probability of getting j heads after first i tosses.
+
+Transition    
+#   Now, we have two cases first, when i>j and second when i==j.
+    When i==j we have no room to choose a tail, we must choose head for rest of the chances as we need atleast j heads in our i chances where i==j.
+    When i>j that is when number of chances > number of heads, then we can choose any one amongst head or tail as long as i>j.
+    Now for a dp[i][j] if I choose a tail then dp[i][j] = probability of getting j heads after i-1 chances * probability of getting a tail in ith chance .
+    Now for a dp[i][j] if I choose a head then dp[i][j] = probability of getting j-1 heads after i-1 chances * probability of getting jth head in ith chance.
+    So our transition becomes
+    if(i>j)
+    dp[i][j] = dp[i-1][j-1]*p(head) + dp[i-1][j]*(1-p(head));
+    else
+    dp[i][j]=dp[i-1][j-1]*p(head);
+
+Base Case 
+#   dp[i][0]=1 => probability of getting no head at all=1 by not choosing anything.
+    dp[0][i]=0 => probability of getting heads without taking any chance.
+
+Final Subproblem
+# dp[n][n/2+1]
+*/
+#include<bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+// using namespace __gnu_pbds;
+using namespace std;
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int mod=1e9+7;
+    // vector<long long int> v1(n),v2(n),pw1(n),pw2(n);
+    // int prime1=1e9+7,prime2=1e9+19,base1=29,base2=31;
+    // StringHash(base1,prime1,s,v1,pw1);
+    // StringHash(base2,prime2,s,v2,pw2);
+    int n;
+    cin>>n;
+    vector<double> p(n+1);
+    for(int i=1;i<=n;i++)
+    cin>>p[i];
+    vector<vector<double>> dp(n+1,vector<double>(n+1,0));
+    for(int i=0;i<=n;i++)
+    {
+        dp[0][i]=1;
+        dp[i][0]=1;
+    }
+    for(int i=1;i<=n;i++)
+    {
+        for(int j=1;j<=i;j++)
+        {
+            if(i>j)
+            dp[i][j]=p[i]*dp[i-1][j-1]+(1-p[i])*(dp[i-1][j]);
+            else
+            dp[i][j]=p[i]*dp[i-1][j-1];
+            
+        }
+    }
+//===========================================AtCoder: Coins===================================================
+/*
+===================================================Question===================================================
+Problem Statement
+Let 
+N be a positive odd number.There are N coins, numbered 1,2,…,N. For each i (1≤i≤N), when Coin i is tossed, 
+it comes up heads with probability p_i and tails with probability 1−p_i
+Taro has tossed all the N coins. Find the probability of having more heads than tails.
+===================================================Question===================================================
+*/
+/*
+Intution:
+#   We need to find probability of number of heads greater than number of tails after all N tosses.
+    So we need to find Probability of getting (n/2+1) heads.
+#   Now How to approach this problem?
+    Let X=n/2+1.=> Number of heads we want.
+    So, now we have N chances in which we want X heads.
+    
+DP state=> dp[i][j]: Probability of getting j heads after first i tosses.
+
+Transition    
+#   Now, we have two cases first, when i>j and second when i==j.
+    When i==j we have no room to choose a tail, we must choose head for rest of the chances as we need atleast j heads in our i chances where i==j.
+    When i>j that is when number of chances > number of heads, then we can choose any one amongst head or tail as long as i>j.
+    Now for a dp[i][j] if I choose a tail then dp[i][j] = probability of getting j heads after i-1 chances * probability of getting a tail in ith chance .
+    Now for a dp[i][j] if I choose a head then dp[i][j] = probability of getting j-1 heads after i-1 chances * probability of getting jth head in ith chance.
+    So our transition becomes
+    if(i>j)
+    dp[i][j] = dp[i-1][j-1]*p(head) + dp[i-1][j]*(1-p(head));
+    else
+    dp[i][j]=dp[i-1][j-1]*p(head);
+
+Base Case 
+#   dp[i][0]=1 => probability of getting no head at all=1 by not choosing anything.
+    dp[0][i]=1 => probability of getting heads without taking any chance.
+
+Final Subproblem
+# dp[n][n/2+1]
+*/
+#include<bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+// using namespace __gnu_pbds;
+using namespace std;
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int mod=1e9+7;
+    // vector<long long int> v1(n),v2(n),pw1(n),pw2(n);
+    // int prime1=1e9+7,prime2=1e9+19,base1=29,base2=31;
+    // StringHash(base1,prime1,s,v1,pw1);
+    // StringHash(base2,prime2,s,v2,pw2);
+    int n;
+    cin>>n;
+    vector<double> p(n+1);
+    for(int i=1;i<=n;i++)
+    cin>>p[i];
+    vector<vector<double>> dp(n+1,vector<double>(n+1,0));
+    for(int i=0;i<=n;i++)
+    {
+        dp[0][i]=1;
+        dp[i][0]=1;
+    }
+    for(int i=1;i<=n;i++)
+    {
+        for(int j=1;j<=i;j++)
+        {
+            if(i>j)
+            dp[i][j]=p[i]*dp[i-1][j-1]+(1-p[i])*(dp[i-1][j]);
+            else
+            dp[i][j]=p[i]*dp[i-1][j-1];
+            
+        }
+    }
+    
+    //The code asks for all probabilities where no of heads are greater than no of tails but here
+    //we are only giving dp[n][n/2+1] as output. Why? The way DP states have been defined in our problem ensures summation 
+    // of all the possible probabilities and finally storing the answer in dp[n][n/2+1]. Hence 
+    //summation is not required in this case.
+
+    cout<<setprecision(15);
+    cout<<dp[n][n/2+1]<<endl;
+    
+    
+    return 0;
+}
+    cout<<setprecision(15);
+    cout<<dp[n][n/2+1]<<endl;
+    
+    
+    return 0;
+}
