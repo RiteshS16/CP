@@ -1,0 +1,213 @@
+/*
+#   Problem Statement
+There are N items, numbered 1,2,…,N. For each i (1≤i≤N), Item i has a weight of w_i and a value of v_i.
+Taro has decided to choose some of the N items and carry them home in a knapsack. 
+The capacity of the knapsack is W, which means that the sum of the weights of items taken must be at most W.
+Find the maximum possible sum of the values of items that Taro takes home.
+
+Constraints
+All values in input are integers.
+1≤N≤100
+1≤W≤10^9
+1≤w_i≤W
+1≤v_i≤10^3
+
+#   Solution: Classis Knapsack with slight change.
+    The problem is of typical knapsack with one difference that is the limit of max weight W.
+    For W<=1e9, we cannot solve it using normal knapsack where the dp states were dp[n][w]
+    because the time complexity and space complexity will be O(NxW)=O(100*1e9)=O(1e11) which will
+    give TLE.
+#   Way around
+    We need to think of some other DP state which lies within the time limits.
+    Observe that we have max value of v_i to be 10^3. For a total of N items, the max value could
+    go upto N*v_i = 100*10^3==10^5.
+    So, from here we can get and idea that a dp state of dp[N][MaxVal] can be formed which will
+    not go beyond 1e7. O(N.MaxVal)=O(100*1e5)==1e7.
+#   Intuition:
+    We know that our DP state will depend of N and V. We can think of finding minimum weight for
+    a value v in range 1<=v<=MaxVal and then if that minimumweight is <=W then that value can
+    be a potential answer.
+    So our DP state becomes dp[i][j]= Minimum weight for a value j after choosing first i items.
+#   Transition:
+
+    Recursive Approach: Now, there is a difference in the way recursion is implemented in knapsack1 
+    and knapsack2 problem of Atcoder. Knapsack 1 is a classical knapsack problem. 
+    
+    #   The pseudocode of Knapsack 1 is as follows:
+    
+        N=101;W=1e5+1
+        int dp[N][W];
+        recurseKnapsack1(value_array, weight_array, totalWeight, position)
+        {
+            if(position=size of array)
+            return 0;
+            if(dp[totalWeight][position]!=-1)
+            return dp[totalWeight][position];
+            if(totalWeight-weight_array[position]>=0)
+            return dp[totalWeight][position] = max(recurseKnapsack1(value_array, weight_array, totalWeight, position+1),
+                        recurseKnapsack1(value_array, weight_array, totalWeight-weight_array[position], position+1)+value_array[position]);
+            else
+            return dp[totalWeight][position] = recurseKnapsack1(value_array, weight_array, totalWeight, position+1);
+        }
+        main()
+        {
+            vector<int> value_array,weight_array;
+            cin>>N>>W;
+            for(i=0 to N)
+            cin>>weight_array[i]>>value_array[i];
+            int ans=recurse(value_array,weight_array,totalWeight,position)
+            cout<<ans<<endl;
+        }
+    
+    #   The pseudocode of Knapsack 2 is as follows:
+    
+        N=101;V=1e5+1;
+        int dp[N][V];
+        recurseKnapsack2(value_array, weight_array, totalValue, position)
+        {
+            if(totalValue==0)
+            return 0;
+            
+            if(position=size of array)
+            return INF;
+            
+            if(dp[totalValue][position]!=-1)
+            return dp[totalValue][position];
+            if(totalValue-value_array[position]>=0)
+            return dp[totalValue][position] = min(recurseKnapsack2(value_array, weight_array, totalValue, position+1),
+                        recurseKnapsack1(value_array, weight_array, totalValue-value_array[position], position+1)+weight_array[position]);
+            else
+            return dp[totalValue][position] = recurseKnapsack2(value_array, weight_array, totalValue, position+1);
+        }
+        main()
+        {
+            vector<int> value_array,weight_array;
+            cin>>N>>W;
+            for(i=0 to N)
+            cin>>weight_array[i]>>value_array[i];
+            int minWeight;
+            int answer;
+            for(int i=0;i<=1e5;i++)
+            {
+                minWeight=recurse(value_array,weight_array,totalWeight,position);
+                if(minWeight<=W)
+                answer=max(answer,i);
+            }
+            cout<<answer<<endl;
+        }
+    
+    #   Observse the following differences in codes in both the problems
+        
+        (i)     I am trying to maximise VALUE in first code, and minimise the WEIGHT in second code.
+        
+        (ii)    In the first code, I am not trying to find such combinations of items in knapsack which make W=0.
+        Rather the aim is to only maximise the values after adding some items ensuring that sum of 
+        weights of total items in knapsack is LESS THAN OR EQUAL TO W. However, in second code, I am
+        finding such combinations of items for which SUM OF VALUES OF ITEMS WILL BE == CURRENT totalValue. Why? 
+        Suppose, if sum of values of items != totalValue then that totalValue is not valid. Why? because
+        no combination of items results in a value = totalValue or in simple terms we do not have items in the 
+        array which make up the sum of values = totalValue. Hence choosing this value will give me wrong answer.
+        Hence, I will aim to find combination of items such that my sum of values of items in knapsack == totalValue;
+        
+        (iii)   Unlike in 1st code, in 2nd recursive code, I am running a loop in main() for each value from 0 to 
+        maxval to check for the maximum possible value for which weight of items in knapsack<=W. Why? As discussed in
+        point (ii) above, I need to find a suitable value for which sum( values of items in knapsack)=totalValue.
+        And such a value may not be always be =1e5. Therefore, there exists a requirement to check 
+        for each value from 0 to 1e5 which may addup to sum of values of items in knapsack. Such a totalValue 
+        could be a potential answer.
+        
+        (iv)    In second code, it seems as if loop is running for O(N*MAXVAL^2). But it is actually running for
+        O(N*MAXVAL). How? The outer loop iterates over possible values in the main function to determine the 
+        maximum achievable value within the weight limit W. However, since recurse() is already memoized, 
+        each unique (pos, val) combination is only calculated once, not recalculated in each loop iteration.
+        
+        (v)     Returning 0 in second code once totalValue=0 otherwise returning INF. INF means we did not find an answer.
+        0 means we have found a potential answer.
+        (vi) Checking totalValue-value_array[position]>=0 in second code similar to the one in first code. Because I am iterating
+        on value for 0 to MAXVAL in main funtion, and for some values in the range, totalValue-value_array[pos] may become less than 0.
+
+#   Transition for iterative case of knapsack 2
+    
+    if(totalValue-value_array[i]>=0 && totalWeight-weight_array[i])
+    dp[i][j]=min(dp[i-1][j-value_array[i]]+weight_array[i],dp[i-1][j]);
+    else
+    dp[i][j]=dp[i-1][j];
+    
+#   Final Subproblem = max(answer,j) for j=0 to MAXVAL;
+    
+*/
+#include<bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+// using namespace __gnu_pbds;
+
+using namespace std;
+
+long long recurse(vector<long long>& v,vector<long long>& w,long long N,int pos,long long val,vector<vector<long long>>& dp)
+{
+    if(val==0)
+    return 0;
+    if(pos==N)
+    return 1e15;
+    
+    if(dp[pos][val]!=-1)
+    return dp[pos][val];
+    
+    if(val-v[pos]>=0)
+    return dp[pos][val]=min(recurse(v,w,N,pos+1,val-v[pos],dp)+w[pos],recurse(v,w,N,pos+1,val,dp));
+    else
+    return dp[pos][val]=recurse(v,w,N,pos+1,val,dp);
+}
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    long long N,W;
+    cin>>N>>W;
+    vector<long long> v(N),w(N);
+    
+    for(int i=0;i<N;i++)
+    cin>>w[i]>>v[i];
+    
+    //Recursive Approach-------------------------------------------------------------------------------------------------
+    // vector<vector<long long>> dp(N+2,vector<long long>(1e5+1,-1));
+    
+    // long long minWeight;
+    // int maxValue=0;
+    // for(int i=1e5;i>=0;i--)
+    // {
+    //     minWeight=recurse(v,w,N,0,i,dp);
+    //     //First value of minWeight which is less than W will be the maxium i or maximum value
+    //     if(minWeight<=W)
+    //     {
+    //         maxValue=i;break;
+    //     }
+    // }
+    // cout<<maxValue<<endl;
+    //------------------------------------------------------------------------------------------------------------------
+    //Iterative Approach-------------------------------------------------------------------------------------------------
+    vector<vector<long long>> dp(N+1,vector<long long>(1e5+1,W+1));
+    for(int i=1;i<=N;i++)
+    {
+        //To make profit 0, I need 0 weight
+        dp[i-1][0]=0;
+        for(int j=1;j<=1e5;j++)
+        {
+            if(j-v[i-1]>=0 && dp[i-1][j-v[i-1]]+w[i-1]<=W)
+            dp[i][j]=min(dp[i-1][j-v[i-1]]+w[i-1],dp[i-1][j]);
+            else
+            dp[i][j]=dp[i-1][j];
+        }
+    }
+    long long ans=0;
+    for(int i=0;i<=1e5;i++)
+    {
+        if(dp[N][i]<=W)
+        ans=max(1LL*i,ans);
+    }
+    
+    cout<<ans<<endl;
+    //------------------------------------------------------------------------------------------------------------------
+    return 0;
+}
