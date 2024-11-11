@@ -1,0 +1,52 @@
+//Problem Statement-Longest Common Subsequence
+//You are given strings s and t. Find one longest string that is a subsequence of both s and t.
+
+#include<bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+// using namespace __gnu_pbds;
+
+using namespace std;
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int mod=1e9+7;
+    string s,t;
+    cin>>s>>t;
+    //if s[i]==t[j] dp[i][j]=dp[i-1][j-1]+1;
+    //else dp[i][j]=max(dp[i+1][j],dp[i][j+1]);
+    int n=s.length();
+    int m=t.length();
+    vector<vector<int>> dp(n+1,vector<int>(m+1));
+    
+    for(int i=n-1;i>=0;i--)
+    {
+        for(int j=m-1;j>=0;j--)
+        {
+            if(s[i]!=t[j])
+            dp[i][j]=max(dp[i+1][j],dp[i][j+1]);
+            else
+            dp[i][j]=dp[i+1][j+1]+1;
+        }
+    }
+    int num=1;
+    string str="";
+    int i=0,j=0;
+    while(i< n && j<m)
+    {
+        
+        if(s[i]==t[j])
+        {
+            str+=s[i];i++;j++;
+        }
+        else if(dp[i+1][j]>dp[i][j+1])
+        i++;
+        else
+        j++;
+    }
+    // reverse(str.begin(),str.end());
+    cout<<str<<endl;
+    return 0;
+}
