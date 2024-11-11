@@ -1,0 +1,86 @@
+/* Rectangle Cutting
+Given an aXb rectangle, your task is to cut it into squares. On each move you can select a rectangle and cut it into two rectangles in such 
+a way that all side lengths remain integers. What is the minimum possible number of moves?
+
+Input
+The only input line has two integers a and b.
+
+Output
+Print one integer: the minimum number of moves.
+*/
+#include<bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+// using namespace __gnu_pbds;
+/*
+#   Intution:
+    #   For given sides of rectangle L(Length) and B(Breadth)(now on called LB), I can create rectangle 
+    LB in the following ways:
+        #   First lets looks at the possibilties of adding different lengths: 
+            #   Adding rectangle of dimensions 1xB to (L-1)xB; No of moves to make LB from 1xB and (L-1)xB is= No of Moves to make 1xB + No of Moves to make (L-1)xB
+            #   Adding rectangle of dimensions 2xB to (L-2)xB; No of moves to make LB from 2xB and (L-2)xB is= No of Moves to make 2xB + No of Moves to make (L-2)xB
+            #   Adding rectangle of dimensions 3xB to (L-3)xB; And so on....
+            #   ...
+            #   ... 
+            #   ... and so on upto Adding rectangle of dimensions (L-1)xB to 1xB;
+            
+        #   Now lets looks at the possibilties of adding different breadths:
+            #   Adding rectangle of dimensions Lx1 to Lx(B-1); No of moves to make LB from Lx1 and Lx(B-1) is= No of Moves to make  Lx1 + No of Moves to make  Lx(B-1) 
+            #   Adding rectangle of dimensions Lx2 to Lx(B-2); And so on....
+            #   Adding rectangle of dimensions Lx3 to Lx(B-3);
+            #   ...
+            #   ... 
+            #   ... and so on upto Adding rectangle of dimensions Lx(B-1) to Lx1;
+        #   So, Basically, minimum number of moves in creating a rectangle LB will be equal to minimum of all the possibilties
+        #   DP State= dp[i][j]=minimum number of moves to create rectangle of length i and breadth j.
+        #   Transition:   for(i=1 to a)
+                            {
+                                for(j=1 to b)
+                                {
+                                    if(i==j)
+                                    dp[i][j]=0;
+                                    else
+                                    {
+                                        int X=INT_MAX,Y=INT_MAX;
+                                        for(k=1 to b-1)
+                                        Y= min(Y,dp[i][j-k]+dp[i][k])
+                                        for( k=1 to a-1 )
+                                        X=min(X,dp[i-k][j]+dp[k][j]));
+                                        dp[i][j]=min(X,Y)+1;
+                                    }
+                                    
+                                }
+                            }
+        #   Final Subproblem dp[a][b];
+        #   Base case dp[i][j]=0 for all i==j;
+*/
+//Time Complexity O(a*b*(a+b));
+//Space Complexity O(a*b)
+using namespace std;
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int mod=1e9+7;
+    int a,b;
+    cin>>a>>b;
+    vector<vector<int>> dp(a+1,vector<int>(b+1,0));
+    for(int i=1;i<=a;i++)
+    {
+        for(int j=1;j<=b;j++)
+        {
+            if(i==j)
+            continue;
+            int x=INT_MAX,y=INT_MAX;
+            for(int k=1;k<i;k++)
+            x=min(x,dp[i-k][j]+dp[k][j]);
+            for(int k=1;k<j;k++)
+            y=min(y,dp[i][j-k]+dp[i][k]);
+            dp[i][j]=min(x,y)+1;
+        }
+    }
+    cout<<dp[a][b]<<endl;
+    
+    return 0;
+}
