@@ -103,7 +103,7 @@ All values in input are integers.
         (ii)    In the first code, I am not trying to find such combinations of items in knapsack which make W=0.
         Rather the aim is to only maximise the values after adding some items ensuring that sum of 
         weights of total items in knapsack is LESS THAN OR EQUAL TO W. However, in second code, I am
-        finding such combinations of items for which SUM OF VALUES OF ITEMS WILL BE == CURRENT totalValue. Why? 
+        finding such combinations of items for which SUM OF VALUES OF ITEMS WILL BE EXACTLY = CURRENT totalValue. Why? 
         Suppose, if sum of values of items != totalValue then that totalValue is not valid. Why? because
         no combination of items results in a value = totalValue or in simple terms we do not have items in the 
         array which make up the sum of values = totalValue. Hence choosing this value will give me wrong answer.
