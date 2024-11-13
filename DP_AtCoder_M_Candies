@@ -1,0 +1,82 @@
+#include<bits/stdc++.h>
+// #include <ext/pb_ds/assoc_container.hpp>
+// #include <ext/pb_ds/tree_policy.hpp>
+// using namespace __gnu_pbds;
+using namespace std;
+/*
+#   Intution
+    #   Suppose ith child take a maximum of a[i] candies, and a total of j candies are to
+    be distributed amongst these i children then ith child can take any number of
+    candies from 0 to a[i].
+    #   So, the total number of ways in which j candies can be distributed among first i children 
+    will be summation of the number of ways found in the following possibilities.
+        #   Candies taken by ith student        Candies to be taken by remaining i-1 students
+                    0                                           j-0
+                    1                                           j-1
+                    2                                           j-2
+                    3                                           j-3
+                    .                                           .
+                    .                                           .
+                    a[i]                                        j-a[i]
+        Sum of all the ways from above possibilities will give me the answer.
+    #   Hence, DP state will be
+        dp[i][j]: Number of ways in which j candies can be distributed amongst first i children.
+    #   Transition:
+        dp[i][j] = Sum of (dp[i-1][j]+dp[i-1][j-1]+dp[i-1][j-2]+....+dp[i-1][j-a[i]])
+                 = Sum of ( No of ways i-1 children can pick j candies +  
+                            No of ways i-1 children can pick j-1 candies +  
+                            No of ways i-1 children can pick j-2 candies +  
+                            ....
+                            No of ways i-1 children can pick j-a[i] candies
+                          ) 
+    #   Base Case: dp[0][0]= Number of ways in which no candies are distributed amongst 0 children.
+    #   Final Subproblem: dp[n][k]
+    #   Time Complexity: O(N*K^2) because we have to sum all the previous dp states to calculate existing dp states
+        Optimisation: Do prefix sum of previous dp state. After which my Transition equation will look like:
+            dp[i][j]=psum[i-1][j]-psum[i-1][j-a[i]-1];
+        New time complexity: O(N*K).
+*/
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int mod=1e9+7;
+    int n,k;
+    cin>>n>>k;
+    vector<int> a(n);
+    int sum=0;
+    for(int i=0;i<n;i++)
+    {
+        cin>>a[i];
+        sum+=a[i];
+    }
+    if(sum<k)
+    cout<<0<<endl;
+    else
+    {
+        vector<vector<int>> dp(n+1,vector<int>((k+1),0));
+        
+        //Base Case: Number of ways to distribute no candies to no children.
+        dp[0][0]=1;
+        for(int i=1;i<=n;i++)
+        {
+            for(int j=1;j<=k;j++)
+            {
+                dp[i-1][j]+=dp[i-1][j-1];
+                dp[i-1][j]%=mod;
+            }
+            for(int j=0;j<=k;j++)
+            {
+                if(j-a[i-1]<=0)
+                dp[i][j]=dp[i-1][j];
+                else 
+                dp[i][j]=(dp[i-1][j]-dp[i-1][j-a[i-1]-1]+mod)%mod;
+            }
+        }
+        cout<<dp[n][k]<<endl;
+    }
+    
+    return 0;
+}
