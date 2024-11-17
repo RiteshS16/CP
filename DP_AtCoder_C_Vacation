@@ -1,0 +1,82 @@
+/*
+Problem: Vacation
+Taro's summer vacation starts tomorrow, and he has decided to make plans for it now.
+The vacation consists of N days. For each i (1≤i≤N), Taro will choose one of the following 
+activities and do it on the i-th day:
+
+A: Swim in the sea. Gain a_i points of happiness.
+B: Catch bugs in the mountains. Gain b_i points of happiness.
+C: Do homework at home. Gain c_i points of happiness.
+As Taro gets bored easily, he cannot do the same activities for two or more consecutive days.
+
+Find the maximum possible total points of happiness that Taro gains.
+
+Intution:
+#   Taro can choose either to swim, catch bug or do homework.
+#   On ith day Taro can swim only if he decides not to swim on the i+1th day. 
+Similarly for cathing bug and doing homework.
+#   So, maximum sum of points at ith day = maximum sum till i+1th day + ith day (swim points || bug point || home work points)
+#   State: dp[i][j]: maximum points from nth day to ith day if taro decides to choose jth activity on ith day.
+    Transition: d[i][0]=a[0]+max(dp[i+1][1],dp[i+1][2]),
+                d[i][1]=a[1]+max(dp[i+1][0],dp[i+1][2]),
+                d[i][2]=a[2]+max(dp[i+1][0],dp[i+1][1]),
+    Base Case;  dp[n-1][0]=v[n-1][0];
+                dp[n-1][1]=v[n-1][1];
+                dp[n-1][2]=v[n-1][2];
+    Final Subproblem: max(dp[0][0],dp[0][1],dp[0][2]);
+*/
+#include<bits/stdc++.h>
+using namespace std;
+
+int recurse(vector<vector<int>>& v, vector<vector<int>>&dp, int pos,int lastused)
+{
+    int n=dp.size();
+    if(pos==n)
+    return 0;
+    
+    if(lastused!=-1 && dp[pos][lastused]!=-1)
+    return dp[pos][lastused];
+    
+    int ans=max(((lastused!=1)?(v[pos][0]+recurse(v,dp,pos+1,1)):0),
+            max(((lastused!=2)?(v[pos][1]+recurse(v,dp,pos+1,2)):0),
+                ((lastused!=3)?(v[pos][2]+recurse(v,dp,pos+1,3)):0)));
+    
+    return dp[pos][lastused] = ans;
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int mod=1e9+7;
+    int n;
+    cin>>n;
+    vector<vector<int>> v(n,vector<int>(3,0));
+    for(int i=0;i<n;i++)
+    cin>>v[i][0]>>v[i][1]>>v[i][2];
+    //========================================ITERATIVE CODE========================================
+    vector<vector<int>> dp(n,vector<int>(3,0));
+    // dp[i][0]-> Swim 
+    // dp[i][1]-> catch bugs
+    // dp[i][2]->homework
+    dp[n-1][0]=v[n-1][0];
+    dp[n-1][1]=v[n-1][1];
+    dp[n-1][2]=v[n-1][2];
+    for(int i=n-2;i>=0;i--)
+    {
+        dp[i][0]=v[i][0]+max(dp[i+1][1],dp[i+1][2]);
+        dp[i][1]=v[i][1]+max(dp[i+1][0],dp[i+1][2]);
+        dp[i][2]=v[i][2]+max(dp[i+1][0],dp[i+1][1]);
+    }
+    cout<<max(dp[0][0],max(dp[0][1],dp[0][2]))<<endl;
+    //========================================Recursive Code========================================
+    // vector<vector<int>> dp(n,vector<int>(4,-1));
+    // // dp[i][1]-> Swim 
+    // // dp[i][2]-> catch bugs
+    // // dp[i][3]->homework
+    // int pos=0;int lastused=0;
+    // int ans=recurse(v,dp,pos,lastused);
+    // cout<<ans<<endl;
+    return 0;
+}
