@@ -1,0 +1,52 @@
+#include <iostream>
+#include<vector>
+using namespace std;
+long long recurse(vector<pair<int,int>>&V,int pos,int W,vector<vector<long long>>&dp)
+{
+    int n=V.size();
+    int w=V[pos].first,v=V[pos].second;
+    if(pos==n)
+    return 0;
+    
+    if(dp[pos][W]!=-1)
+    return dp[pos][W];
+    
+    
+    long long ans=0;
+    ans=recurse(V,pos+1,W,dp);
+    if(W-w>=0)
+    ans=max(ans,recurse(V,pos+1,W-w,dp)+v);
+    return dp[pos][W]=ans;
+}
+int main()
+{
+    int N,W;
+    cin>>N>>W;
+    vector<pair<int,int>> V;
+    for(int i=0;i<N;i++)
+    {
+        int w,v;
+        cin>>w>>v;
+        V.push_back({w,v});
+    }
+    //============================================Recursive Code================================================
+    // vector<vector<long long>> dp(N+2,vector<long long>(W+2,-1));
+    // long long ans=recurse(V,0,W,dp);
+    // cout<<ans<<endl;
+    //============================================Iterative Code================================================
+    vector<vector<long long>> dp(N+1,vector<long long>(W+1,0));
+    
+    for(int i=1;i<=N;i++)
+    {
+        for(int j=1;j<=W;j++)
+        {
+            int w=V[i-1].first,v=V[i-1].second;
+            if(j-w>=0)
+            dp[i][j]=max(dp[i-1][j],dp[i-1][j-w]+v);
+            else
+            dp[i][j]=dp[i-1][j];
+        }
+    }
+    cout<<dp[N][W]<<endl;
+    return 0;
+}
