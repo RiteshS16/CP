@@ -1,0 +1,88 @@
+/*
+Problem: Sushi
+There are N dishes, numbered 1,2,…,N. Initially, for each i (1≤i≤N), Dish i has a_i (1≤ a_i ≤3) pieces 
+of sushi on it.
+Taro will perform the following operation repeatedly until all the pieces of sushi are eaten:
+Roll a die that shows the numbers 1,2,…,N with equal probabilities, and let 
+i be the outcome. If there are some pieces of sushi on Dish i, eat one of them; if there is none, do nothing.
+Find the expected number of times the operation is performed before all the pieces of sushi are eaten.
+*/
+#include<bits/stdc++.h>
+using namespace std;
+
+/*
+#   Intution: 
+    #   We know that the possible number of sushis in each plate could be 0,1,2 or 3.
+        c0->Number of plates with 0 sushi on them
+        c1->Number of plates with 1 sushi on them
+        c2->Number of plates with 2 sushi on them
+        c3->Number of plates with 3 sushi on them
+    
+    #   Also, c0+c1+c2+c3=n (Total number of plates);
+    
+    #   Probability of getting a plate with 0 sushi in it= c0/n;
+        Probability of getting a plate with 1 sushi in it= c1/n;
+        Probability of getting a plate with 2 sushi in it= c2/n;
+        Probability of getting a plate with 3 sushi in it= c3/n;
+    
+    #   Aim: Find expected number of operation before all the pieces 
+        of sushi are eaten or 0 sushi left in all plates.
+        #   E0=P0*(1+E0)+P1*(1+E1)+P2*(1+E2)+P3*(1+E3) //Using mathematical equation of Expected value
+            
+            On simplifying we will get:
+            
+            E0=(n+c1*E1+c2*E2+c3*E3)/(c1+c2+c3);
+    
+    #   Dp State=dp[c0,c1,c2,c3]=> expected value when c0 plates have 0 sushi, c1 plates have 1 sushi,
+                                c2 plates have 2 shushi and c3 plates have 3 sushi.
+        #   Observe that one state is redundant. If I have c1,c2 and c3 I can calculate c0=n-(c1+c2+c3);
+        #   Hence, my states now become dp[c1,c2,c3];
+    
+    #   Transition: dp[c1,c2,c3]=(n+c1*dp[c1-1,c2,c3]+c2*dp[c1+1,c2-1,c3]+c3*dp[c1,c2+1,c3-1])/(c1+c2+c3);
+    
+    #   Time Complexity: O(N^3)
+        Space Complexity: O(N^3)
+*/
+
+double recurse(vector<double>&v,vector<int>&a,vector<vector<vector<double>>>&dp,double c1,double c2,double c3)
+{
+    double n=(double)a.size();
+    if(c1==0 && c2==0 && c3==0)
+    return 0.0;
+    if(dp[c1][c2][c3]!=-1)
+    return dp[c1][c2][c3];
+    double ans=1;
+    
+    if(c1>0)
+    ans += (c1/n)*recurse(v,a,dp,c1-1,c2,c3);
+    if(c2>0)
+    ans += (c2/n)*recurse(v,a,dp,c1+1,c2-1,c3);
+    if(c3>0)
+    ans += (c3/n)*recurse(v,a,dp,c1,c2+1,c3-1);
+    
+    ans/=((c1+c2+c3)/n);
+    
+    return dp[c1][c2][c3]=ans;
+    
+}
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    double n;
+    cin>>n;
+    vector<int> a(n);
+    vector<double> v(4,0);
+    for(int i=0;i<n;i++)
+    {
+        cin>>a[i];
+        v[a[i]]++;
+    }
+    vector<vector<vector<double>>> dp(n+2,vector<vector<double>>(n+2,vector<double>(n+2,-1)));
+    double ans=recurse(v,a,dp,v[1],v[2],v[3]);
+    cout<<setprecision(20)<<ans<<endl;
+    
+    
+    return 0;
+}
