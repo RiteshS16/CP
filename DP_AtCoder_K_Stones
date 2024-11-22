@@ -1,0 +1,114 @@
+
+/* Problem: Stones
+There is a set 
+A={a1,a2,…,aN} consisting of N positive integers. Taro and Jiro will play the following game against each other.
+Initially, we have a pile consisting of K stones. The two players perform the following operation alternately, 
+starting from Taro:
+Choose an element x in A, and remove exactly x stones from the pile.
+A player loses when he becomes unable to play. Assuming that both players play optimally, determine the winner.
+*/
+
+/*
+#   Intution:
+    #   In game theory questions, one opponent tries to always play such a move that 
+    in the next move the other opponent looses. So in every turn the corresponding apponent will try to 
+    play a move such that the other opponent looses. The game will go on till the time
+    one of the opponents can't play any furhter, or one of the opponent looses.
+    #   We have K stones, first move is played by Taro, second by Jiro. 
+    #   We have N stones, a1,a2,....an.
+    #   Move of the players:
+        #   In first move Taro can choose any a_i for 1<=i<=n.
+        #   Number of stones left after Taro's turn can be anything amongst k-a1, k-a2, k-a3,....,k-an
+        #   Now Jiro will take his turn and suppose he chooses k-a1 stones from previous turn then after his
+        turn, number of stone left could be anything amongst [k-a1-a1,k-a1-a2,k-a1-a3...k-a1-an]
+    #   DP State: dp[x]=> Winner after x stones after left. if dp[x]=0 Jiro is winner else Taro is winner after x stones are left.
+        Transition: When x stones are left dp[x] |= (dp[x-a[i]]==0) for i =0 to n-1.Why? 
+        dp[x]=>Turn of Taro. dp[x-a[i]]=>Turn of Jiro. 
+        So if dp[x-a[i]] was won by Jiro, Taro will loose the next turn,
+        However, if dp[x-a[i]] was lost by Jiro then Taro will win in the next turn.
+        Hence, Taro's turn output = !Jiro's turn output.
+    
+*/
+#include<bits/stdc++.h>
+using namespace std;
+
+// bool recurse(vector<int>& a,int player,int k,vector<vector<int>>& dp)
+// {
+//     int n=a.size();
+//     if(k==0)
+//     return player==0 ? false:true;
+    
+//     if(dp[k][player]!=-1)
+//     return dp[k][player];
+    
+//     bool ans=false;
+//     for(int i=0;i<n;i++)
+//     {
+//         if(k-a[i]>=0)
+//         ans |= ((player==0) ? recurse(a,!player,k-a[i],dp) : !recurse(a,!player,k-a[i],dp));
+//     }
+//     return dp[k][player]=((player==0) ? ans:(!ans));
+// }
+bool recurse(vector<int>& a,int k,vector<int>& dp)
+{
+    if(k==0)//No stones are present then taro will loose.
+    return false;
+    
+    int n=a.size();
+    if(dp[k]!=-1)
+    return dp[k];
+    
+    bool ans=false;
+    for(int i=0;i<n;i++)
+    {
+        if(k-a[i]>=0)
+        {
+            bool opponent=recurse(a,k-a[i],dp);
+            //ans|= (opponent==0); Same as ans|=(!opponent)
+            ans|= (!opponent);
+            if(ans)
+            return dp[k]=true;
+        }
+    }
+    return dp[k]=ans;
+}
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int mod=1e9+7;
+    int n,k;
+    cin>>n>>k;
+    vector<int> a(n);
+    for(int i=0;i<n;i++)
+    cin>>a[i];
+    //======================================Recursive======================================
+    vector<int> dp(k+1,-1);
+    bool ans=recurse(a,k,dp);
+    if(ans)
+    cout<<"First"<<endl;
+    else
+    cout<<"Second"<<endl;
+    //======================================Iterative======================================
+    // vector<int> dp(k+1,0);
+    // dp[0]=0;//If no stones are present then Taro will loose.
+    // for(int i=1;i<=k;i++)
+    // {
+    //     for(int j=0;j<n;j++)
+    //     {
+    //         if(i-a[j]>=0)
+    //         {
+    //             dp[i]|= (dp[i-a[j]]==0);//dp[i-a[j]]=>opponent's turn, which if is ==0 then Taro will win
+    //         }
+    //     }
+    // }
+    
+    // if(dp[k])
+    // cout<<"First"<<endl;
+    // else
+    // cout<<"Second"<<endl;
+    
+    
+    return 0;
+}
