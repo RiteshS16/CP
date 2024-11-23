@@ -1,0 +1,94 @@
+/*
+Problem: Slimes
+There are N slimes lining up in a row. Initially, the i-th slime from the left has a size of a_i.
+Taro is trying to combine all the slimes into a larger slime. He will perform the following operation 
+repeatedly until there is only one slime:
+Choose two adjacent slimes, and combine them into a new slime. The new slime has a size of 
+x+y, where x and y are the sizes of the slimes before combining them. Here, a cost of 
+x+y is incurred. The positional relationship of the slimes does not change while combining slimes.
+Find the minimum possible total cost incurred.
+*/
+
+/*
+#   Intuition:
+    #   Let us imagine that we want to find th minimum value to combined elements of range [L,R].
+    #   So, the possibilities of forming range [L,R] are:  
+        #   [L,L] + [L+1,R]
+        #   [L,L+1] + [L+2,R]
+        #   [L,L+2] + [L+3,R]
+        .
+        .
+        .
+        #   [L,k] + [k+1,R]
+        .
+        .
+        #   [L,R-1] + [R,R]
+    #   The answer will be the minimum cost amongst all these values.
+    #   DP state: dp[l][r]= Minimum cost required to form the range [l,r];
+    #   Transition: dp[l][r]= min(dp[l][r],dp[l][i] + dp[i+1][r] + psum[i]-psum[l-1] + psum[r]-psum[i]); for i=l to r-1.
+    #   Final Subproblem: dp[1][n]
+    #   Base Case:  dp[i][i]= 0. Cost to form the single element is always 0.
+    #   Time Complexity: O(N^3), Space Complexity: O(N^2)
+*/ 
+#include<bits/stdc++.h>
+using namespace std;
+
+long long recurse(vector<int>& a,vector<vector<long long>>& dp,int l,int r,vector<long long>& psum)
+{
+    if(l==r)
+    return 0;
+    
+    if(dp[l][r]!=-1)
+    return dp[l][r];
+    
+    long long ans=1e15;
+    for(int i=l;i<r;i++)
+    ans=min(ans,recurse(a,dp,l,i,psum) + recurse(a,dp,i+1,r,psum) + psum[i]-psum[l-1] + psum[r]-psum[i] );
+    return dp[l][r]=ans;
+}
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int mod=1e9+7;
+    int n;
+    cin>>n;
+    vector<int> a(n+1);
+    vector<long long> psum(n+1);
+    for(int i=1;i<=n;i++)
+    {
+        cin>>a[i];
+        psum[i]=a[i]+psum[i-1];
+    }
+    //======================================Recursive======================================
+    // vector<vector<long long>> dp(n+1,vector<long long>(n+1,-1));
+    // long long  ans=recurse(a,dp,1,n,psum);
+    //======================================Iterative======================================
+    vector<vector<long long>> dp(n+1,vector<long long>(n+1,1e15));
+    for(int l=1;l<=n;l++)
+    {
+        for(int r=1;r<=n;r++)
+        {
+            if(l==r)
+            dp[l][r]=0;
+        }
+    }
+    for(int l=n;l>0;l--)
+    {
+        for(int r=l;r<=n;r++)
+        {
+            for(int k=l;k<r;k++)
+            {
+                if(l==r)
+                dp[l][r]=0;
+                else
+                {
+                    dp[l][r]=min(dp[l][r],dp[l][k]+dp[k+1][r] + psum[k]-psum[l-1]+psum[r]-psum[k]);
+                }
+            }
+        }
+    }
+    cout<<dp[1][n]<<endl;
+    return 0;
+}
