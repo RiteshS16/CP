@@ -79,7 +79,7 @@ N pairs, modulo 10^9+7.
                 #   Row r.
                 #   Mask.
             #   So, we can not create a DP solution like 
-                dp[r][mask]
+                dp[r][mask]= Number of successful pairs when I am on ith man and I have successfully paired mask women.
             #   Recursive code given below.
             
 
