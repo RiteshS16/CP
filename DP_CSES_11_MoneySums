@@ -1,0 +1,78 @@
+//===========================================CSES: Money Sums===================================================
+/*
+===================================================Question===================================================
+You have n coins with certain values. Your task is to find all money sums you can create using these coins.
+
+Input
+The first input line has an integer n: the number of coins.
+The next line has n integers x_1,x_2,...,x_n: the values of the coins.
+
+Output
+First print an integer k: the number of distinct money sums. After this, print all possible sums in increasing order.
+Constraints
+
+1 <= n <= 100
+1 <= x_i <= 1000
+===================================================Intution===================================================
+We know the maximum sum that can be attained is 100*1000 which is equal to 100000(mxsum).
+So, consider sum=i for i=1 to mxsum. Then run a recursive code for each sum. 
+If the sum==0  after certain combinations of coins, return true else return false.
+if(true)=> store the sum in a set.
+output== size of set and then all the values in the set.
+Convert this recursie solution in memoised one by using 2D DP dp[mxsum+1][n+1];
+*/
+
+#include<bits/stdc++.h>
+using namespace std;
+
+bool recurse(int sum,vector<int>&x,int pos,vector<vector<int>> &dp)
+{
+    int n=x.size();
+    if(pos==n)
+    {
+        if(sum==0)
+        return true;
+        else
+        return false;
+    }
+    
+    if(dp[sum][pos]!=-1)
+    return dp[sum][pos];
+    
+    bool ans=false;
+    ans|=recurse(sum,x,pos+1,dp);
+    if(sum-x[pos]>=0)
+        ans|=recurse(sum-x[pos],x,pos+1,dp);
+    
+    return dp[sum][pos]=ans;
+}
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int n;
+    cin>>n;
+    vector<int> x(n);
+    int mxsum=0;
+    for(int i=0;i<n;i++)
+    {
+        cin>>x[i];
+        mxsum+=x[i];
+    }
+    set<int> sums;
+    vector<vector<int>> dp(mxsum+1,vector<int>(n+1,-1));
+    for(int i=1;i<=mxsum;i++)
+    {
+        bool ans=false;
+        ans=recurse(i,x,0,dp);
+        if(ans)
+        sums.insert(i);
+    }
+    cout<<sums.size()<<endl;
+    for(auto itr=sums.begin();itr!=sums.end();itr++)
+    cout<<(*itr)<<" ";
+    cout<<endl;
+
+    return 0;
+}
