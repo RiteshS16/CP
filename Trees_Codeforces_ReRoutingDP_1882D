@@ -1,0 +1,68 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+void dfs(vector<vector<long long>> &adj,vector<long long> &dp,vector<long long> &subtreeSize,vector<long long>&par,vector<long long> &a,int node,int parent)
+{
+    par[node]=parent;
+    for(int i=0;i<adj[node].size();i++)
+    {
+        if(adj[node][i]!=parent)
+        {
+            
+            dfs(adj,dp,subtreeSize,par,a,adj[node][i],node);
+            subtreeSize[node]+=subtreeSize[adj[node][i]];
+            dp[node] += dp[adj[node][i]];
+        }
+    }
+    if(node!=1)
+    dp[node] += (a[node]^a[parent])*subtreeSize[node];
+    return ;
+}
+void reroot(vector<vector<long long>> &adj,vector<long long> &dp,vector<long long> &subtreeSize,vector<long long>&par,vector<long long>&a,int node,int parent)
+{
+    int n=adj.size()-1;
+    
+    if(node!=1)
+        dp[node] = dp[parent] + (n- subtreeSize[node])*(a[parent]^a[node]) - (a[parent]^a[node])*subtreeSize[node];
+    
+    for(int i=0;i<adj[node].size();i++)
+    {
+        if(adj[node][i]!=parent)
+        reroot(adj,dp,subtreeSize,par,a,adj[node][i],node);
+    }
+    
+    return;
+}
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int t;
+    cin>>t;
+    while(t--)
+    {
+        int n;
+        cin>>n;
+        vector<long long> a(n+1);
+        for(int i=1;i<=n;i++)
+        cin>>a[i];
+        vector<vector<long long>> adj(n+1);
+        for(int i=1;i<=n-1;i++)
+        {
+            int u,v;
+            cin>>u>>v;
+            adj[u].push_back(v);
+            adj[v].push_back(u);
+        }
+        vector<long long> dp(n+1,0);
+        vector<long long> par(n+1,0);
+        vector<long long> subtreeSize(n+1,1);
+        dfs(adj,dp,subtreeSize,par,a,1,-1);
+        reroot(adj,dp,subtreeSize,par,a,1,-1);
+        for(int i=1;i<=n;i++)
+        cout<<dp[i]<<" ";
+        cout<<endl;
+    }
+    return 0;
+}
