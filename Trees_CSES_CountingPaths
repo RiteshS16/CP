@@ -1,0 +1,90 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+void dfs(vector<vector<int>>&adj,vector<vector<int>>&binaryLift,int node,int parent,vector<int>&depth,int d)
+{
+    int m=binaryLift[0].size();
+    binaryLift[node][0]=parent;
+    depth[node]=d;
+    for(int i=1;i<m;i++)
+    binaryLift[node][i]=binaryLift[binaryLift[node][i-1]][i-1];
+    for(int i=0;i<adj[node].size();i++)
+    {
+        if(adj[node][i]!=parent)
+        dfs(adj,binaryLift,adj[node][i],node,depth,d+1);
+    }
+    return;
+}
+int LCA(vector<vector<int>>&binaryLift,vector<int>&depth,int a,int b)
+{
+    int m=binaryLift[0].size();
+    if(depth[a]<depth[b])
+    swap(a,b);
+    int diff=depth[a]-depth[b];
+    for(int i=0;i<m;i++)
+    {
+        if((diff>>i)&1)
+            a=binaryLift[a][i];
+    }
+    if(a==b)
+    return a;
+    for(int i=m-1;i>=0;i--)
+    {
+        if(binaryLift[a][i]!=binaryLift[b][i])
+        {
+            a=binaryLift[a][i];
+            b=binaryLift[b][i];
+        }
+    }
+    return binaryLift[a][0];
+}
+
+void dfs2(vector<vector<int>>&adj,vector<long long>&diffArray,int node,int parent)
+{
+    for(int i=0;i<adj[node].size();i++)
+    {
+        if(adj[node][i]!=parent)
+        {
+            dfs2(adj,diffArray,adj[node][i],node);
+            diffArray[node]+=diffArray[adj[node][i]];
+        }
+    }
+    return;
+}
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int n,m;
+    cin>>n>>m;
+    vector<vector<int>> adj(n+1);
+    for(int i=1;i<=n-1;i++)
+    {
+        int u,v;
+        cin>>u>>v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    vector<vector<int>> binaryLift(n+1,vector<int>(20,0));
+    vector<int> depth(n+1);
+    dfs(adj,binaryLift,1,0,depth,0);
+    vector<long long> diffArray(n+1,0);
+    for(int i=1;i<=m;i++)
+    {
+        int u,v;
+        cin>>u>>v;
+        int lca=LCA(binaryLift,depth,u,v);
+        //Using the concept of delta encoding or differece array.
+        diffArray[u]++;
+        diffArray[v]++;
+        diffArray[lca]--;
+        diffArray[binaryLift[lca][0]]--;
+    }
+    //To calculate summation of difference array (Delta Encoding) over a tree.
+    dfs2(adj,diffArray,1,0);
+    for(int i=1;i<=n;i++)
+    cout<<diffArray[i]<<" ";
+    cout<<endl;
+    return 0;
+}
