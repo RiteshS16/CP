@@ -1,0 +1,53 @@
+#include<bits/stdc++.h>
+using namespace std;
+ 
+void dfs(vector<vector<int>>&adj,vector<long long>&depth,vector<int> &subtreeSize,int node,int parent,int d)
+{
+    depth[node]=d;
+    for(int i=0;i<adj[node].size();i++)
+    {
+        if(adj[node][i]!=parent)
+        {
+            dfs(adj,depth,subtreeSize,adj[node][i],node,d+1);
+            depth[node]+=depth[adj[node][i]];
+            subtreeSize[node]+=subtreeSize[adj[node][i]];
+        }
+    }
+    return;
+}
+void reroot(vector<vector<int>>&adj,vector<long long>&depth,vector<int> &subtreeSize,int node,int parent)
+{
+    int n=adj.size()-1;
+    if(node!=1)
+        depth[node]=depth[parent] + n - 2*subtreeSize[node];
+    for(int i=0;i<adj[node].size();i++)
+    {
+        if(adj[node][i]!=parent)
+        reroot(adj,depth,subtreeSize,adj[node][i],node);
+    }
+    return;
+}
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int n;
+    cin>>n;
+    vector<vector<int>> adj(n+1);
+    for(int i=1;i<=n-1;i++)
+    {
+        int u,v;
+        cin>>u>>v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    vector<long long> depth(n+1,0);
+    vector<int> subtreeSize(n+1,1);
+    vector<int> par(n+1);
+    dfs(adj,depth,subtreeSize,1,0,0);
+    reroot(adj,depth,subtreeSize,1,0);
+    for(int i=1;i<=n;i++)
+    cout<<depth[i]<<" ";
+    cout<<endl;
+    return 0;
