@@ -1,0 +1,126 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+void dfs(vector<vector<int>>&adj,vector<vector<int>>&binaryLift,int node,int parent,vector<int>&depth,int d)
+{
+    int m=binaryLift[0].size();
+    binaryLift[node][0]=parent;
+    depth[node]=d;
+    for(int i=1;i<m;i++)
+    binaryLift[node][i]=binaryLift[binaryLift[node][i-1]][i-1];
+    for(int i=0;i<adj[node].size();i++)
+    {
+        if(adj[node][i]!=parent)
+        dfs(adj,binaryLift,adj[node][i],node,depth,d+1);
+    }
+    return;
+}
+int LCA(vector<vector<int>>&binaryLift,vector<int>&depth,int a,int b)
+{
+    int m=binaryLift[0].size();
+    if(depth[a]<depth[b])
+    swap(a,b);
+    int diff=depth[a]-depth[b];
+    for(int i=0;i<m;i++)
+    {
+        if((diff>>i)&1)
+            a=binaryLift[a][i];
+    }
+    if(a==b)
+    return a;
+    for(int i=m-1;i>=0;i--)
+    {
+        if(binaryLift[a][i]!=binaryLift[b][i])
+        {
+            a=binaryLift[a][i];
+            b=binaryLift[b][i];
+        }
+    }
+    return binaryLift[a][0];
+}
+
+void dfs2(vector<vector<int>>&adj,vector<long long>&diffArray,int node,int parent)
+{
+    for(int i=0;i<adj[node].size();i++)
+    {
+        if(adj[node][i]!=parent)
+        {
+            dfs2(adj,diffArray,adj[node][i],node);
+            diffArray[node]+=diffArray[adj[node][i]];
+        }
+    }
+    return;
+}
+void calDiameter(vector<vector<int>> &adj,vector<int> &level,int node,int parent,int d)
+{
+    level[node]=d;
+    for(int i=0;i<adj[node].size();i++)
+    {
+        if(adj[node][i]!=parent)
+        calDiameter(adj,level,adj[node][i],node,d+1);
+    }
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int n;
+    cin>>n;
+    vector<vector<int>> adj(n+1);
+    for(int i=1;i<=n-1;i++)
+    {
+        int u,v;
+        cin>>u>>v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    vector<int> level(n+1);
+    calDiameter(adj,level,1,0,0);
+    int nd1,dist=0;
+    for(int i=1;i<=n;i++)
+    {
+        if(level[i]>dist)
+        {
+            nd1=i;dist=level[i];
+        }
+    }
+    calDiameter(adj,level,nd1,0,0);
+    
+    int nd2=0;
+    dist=0;
+    for(int i=1;i<=n;i++)
+    {
+        if(level[i]>dist)
+        {
+            nd2=i;
+            dist=level[i];
+        }
+    }
+    
+    vector<vector<int>> binaryLift(n+1,vector<int>(20,0));
+    vector<int> depth(n+1);
+    dfs(adj,binaryLift,1,0,depth,0);
+    vector<int> maxDist(n+1);
+    for(int i=1;i<=n;i++)
+    {
+        int d1=0,d2=0;
+        int lca1=LCA(binaryLift,depth,i,nd1);
+        if(lca1==i || lca1==nd1)
+        d1=abs(depth[i]-depth[nd1]);
+        else
+        d1=abs(depth[i]-depth[lca1])+abs(depth[nd1]-depth[lca1]);
+        int lca2=LCA(binaryLift,depth,i,nd2);
+        if(i==lca2||nd2==lca2)
+        d2=abs(depth[i]-depth[nd2]);
+        else
+        d2=abs(depth[i]-depth[lca2])+abs(depth[nd2]-depth[lca2]);
+        
+        maxDist[i]=max(d1,d2);
+    }
+    for(int i=1;i<=n;i++)
+    cout<<maxDist[i]<<" ";
+    cout<<endl;
+    return 0;
+}
