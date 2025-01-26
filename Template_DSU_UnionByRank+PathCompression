@@ -16,6 +16,7 @@ class UnionFind
     { 
         if(p[i]==i)
         return i;
+        //This memoization in the code below does path compression.
         return p[i] = findSet(p[i]);
     }
 
@@ -27,6 +28,7 @@ class UnionFind
         int y=findSet(j);
         if(x!=y)
         {
+            //Doing union by rank
             if(rank[x] > rank[y]) p[y] = x;
             else 
             {
