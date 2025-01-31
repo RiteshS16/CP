@@ -1,0 +1,157 @@
+/*
+Concepts used:
+    #   Kosaraju's Algo to find strongly connected component.
+    #   After finding SCC, considering each SCC as one single node.
+    #   We know the property that, if we replace each SCC with single node then the resultant graph becoms a DAG(Directed Acyclic Graph)
+    #   Finding toposort of the given DAG.
+    #   Calculating max coins using DP on DAG by taking advantage of topologically sorted array(taught in strongely connected component class of tle 10).
+*/
+
+#include<bits/stdc++.h>
+using namespace std;
+
+void getComponent(vector<vector<int>>& revAdj,vector<int>&comp,int node,vector<int> &visited)
+{
+    comp.push_back(node);
+    visited[node]=1;
+    for(int i=0;i<revAdj[node].size();i++)
+    if(visited[revAdj[node][i]]==0)
+    getComponent(revAdj,comp,revAdj[node][i],visited);
+    return;
+}
+void toposort2(vector<vector<int>> &adj,vector<int> &topo,vector<int> &visited,int node)
+{
+    visited[node]=1;
+    for(int i=0;i<adj[node].size();i++)
+    {
+        if(visited[adj[node][i]]==0)
+        toposort2(adj,topo,visited,adj[node][i]);
+    }
+    topo.push_back(node);
+    return ;
+}
+vector<vector<int>> getSCC(vector<vector<int>> &adj,vector<vector<int>> &revAdj)
+{
+    int n=adj.size()-1;
+    vector<vector<int>> scc;
+    vector<int> topo;
+    vector<int> visited(n+1,0);
+    for(int i=1;i<=n;i++)
+    {
+        if(visited[i]==0)
+        toposort2(adj,topo,visited,i);
+    }
+    
+    //If reversing the topo sort, start the below mentioned loop(at line 54) from 0.
+    //reverse(topo.begin(),topo.end()); 
+    
+    visited.clear();
+    visited.resize(n+1,0);
+    int cnt=0;
+    
+    //As per the Kosaraju's algo, the loop will start from the node with indegree 0, 
+    //whcih is nothing but the last element in the topo vector(before reverseing the vector)
+    for(int i=topo.size()-1;i>=0;i--)
+    {
+        if(visited[topo[i]]==0)
+        {
+            vector<int> comp;
+            getComponent(revAdj,comp,topo[i],visited);
+            scc.push_back(comp);
+        }
+        
+    }
+    return scc;
+}
+
+void toposort1(vector<set<int>> &ADJ,vector<int>&topo,vector<int> &visited,int node)
+{
+    visited[node]=1;
+    
+    for(auto itr = ADJ[node].begin();itr!=ADJ[node].end();itr++)
+    {
+        if(visited[*itr]==0)
+        toposort1(ADJ,topo,visited,(*itr));
+    }
+    topo.push_back(node);
+    return;
+}
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int n,m;
+    cin>>n>>m;
+    vector<int> k(n+1);
+    for(int i=1;i<=n;i++)
+    cin>>k[i];
+    vector<vector<int>> adj(n+1),revAdj(n+1);
+    for(int i=1;i<=m;i++)
+    {
+        int u,v;
+        cin>>u>>v;
+        //In a directed graph adj list is storing child node i.
+        adj[u].push_back(v);
+        //In a directed revAdj list is storing parent of each node i.
+        revAdj[v].push_back(u);
+    }
+    //scc stores the strongly components
+    vector<vector<int>> scc=getSCC(adj,revAdj);
+    vector<int> nodes(n+1);
+    int sccSz=scc.size();
+    
+    //Initially stores the total coins in each SCC.
+    vector<long long> dist(sccSz+1,0);
+    for(int i=0;i<sccSz;i++)
+    {
+        vector<int> v=scc[i];
+        for(int j=0;j<v.size();j++)
+        {
+            nodes[v[j]]=i+1;
+            dist[i+1]+=k[v[j]];
+        }
+        
+    }
+    
+    //Adjacency matrix of newly formed nodes of DAG.
+    vector<set<int>> ADJ(sccSz+1);
+    
+    for(int i=1;i<=n;i++)
+    {
+        vector<int> v=adj[i];
+        for(int j=0;j<v.size();j++)
+        if(nodes[i]!=nodes[adj[i][j]])
+        ADJ[nodes[i]].insert(nodes[adj[i][j]]);
+    }
+    
+    //stores topological sorted order of new nodes of DAG.
+    vector<int> topo;
+    vector<int> visited(sccSz+1,0);
+    for(int i=1;i<=ADJ.size()-1;i++)
+    {
+        if(visited[i]==0)
+        toposort1(ADJ,topo,visited,i);
+    }
+    reverse(topo.begin(),topo.end());
+    visited.resize(sccSz+1,0);
+    
+    //stores the maximum coins that can be collected.
+    vector<long long> ans(sccSz+1,0);
+    ans=dist;
+    
+    //DP logic of DAG using topological sorted vector
+    for(int i=0;i<topo.size();i++)
+    {
+        for(auto itr=ADJ[topo[i]].begin();itr!=ADJ[topo[i]].end();itr++)
+        {
+            ans[*itr]=max(ans[*itr],dist[*itr]+ans[topo[i]]);
+        }
+    }
+    
+    long long aa=0;
+    for(int i=0;i<ans.size();i++)
+    aa=max(aa,ans[i]);
+    cout<<aa<<endl;
+    return 0;
+}
