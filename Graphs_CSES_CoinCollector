@@ -12,6 +12,9 @@ using namespace std;
 
 void getComponent(vector<vector<int>>& revAdj,vector<int>&comp,int node,vector<int> &visited)
 {
+    //Observer that in toposort2, we are doing pushback after dfs call. Here while getting the 
+    //components, we are doing comp.push_back() before dfs call. getComponent logic is simple dfs
+    // with push back of elements belonging to same connected component.
     comp.push_back(node);
     visited[node]=1;
     for(int i=0;i<revAdj[node].size();i++)
@@ -42,7 +45,7 @@ vector<vector<int>> getSCC(vector<vector<int>> &adj,vector<vector<int>> &revAdj)
         toposort2(adj,topo,visited,i);
     }
     
-    //If reversing the topo sort, start the below mentioned loop(at line 54) from 0.
+    //If reversing the topo sort, start the below mentioned loop(at line 57) from 0.
     //reverse(topo.begin(),topo.end()); 
     
     visited.clear();
