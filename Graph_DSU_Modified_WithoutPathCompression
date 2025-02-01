@@ -1,0 +1,108 @@
+//Modified DSU without path compression.
+//Question:https://codeforces.com/edu/course/2/lesson/7/1/practice/contest/289390/problem/D
+#include<bits/stdc++.h>
+using namespace std;
+class UnionFind{
+private:   
+vector<int> p,rank,rem,experience;
+  
+  public:
+  UnionFind(int n)
+  {
+      p.resize(n,0);
+      rem.resize(n,0);
+      experience.resize(n,0);
+      rank.resize(n,1);
+      for(int i=0;i<n;i++)
+      p[i]=i;
+  }
+  
+  int find_set(int v)
+  {
+      if(v==p[v])
+      return v;
+      return find_set(p[v]);;
+  }
+  int getRemove(int x)
+  {
+      if(p[x]==x)
+      return rem[x];
+      int r=rem[x];
+      return r+=getRemove(p[x]);
+  }
+  int getExperience(int x)
+  {
+      if(p[x]==x)
+      return experience[x];
+      int e=experience[x];
+      return e+=getExperience(p[x]);
+  }
+  int totalExperience(int x)
+  {
+      int gg = getExperience(x);
+      int rr = getRemove(x);
+      return gg-rr;
+  }
+  void addExperience(int x, int v)
+  {
+      x=find_set(x);
+      experience[x]+=v;
+      return;
+  }
+  void union_set(int x,int y)
+  {
+      if(find_set(x)!=find_set(y))
+      {
+          x=find_set(x);
+          y=find_set(y);
+          if(rank[x]>rank[y])
+          {
+             p[y]=x;   
+             rem[y]+=experience[x];
+          }
+          else
+          {
+              p[x]=y;
+              rem[x]+=experience[y];
+              if(rank[y]==rank[x])
+              rank[y]++;
+          }
+      }
+  }
+};
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    
+    int n,m;
+    cin>>n>>m;
+    UnionFind uf(n+1);
+    
+    for(int i=0;i<m;i++)
+    {
+        string s;
+        cin>>s;
+        if(s=="join")
+        {
+            int x,y;
+            cin>>x>>y;
+            uf.union_set(x,y);
+        }
+        else if(s=="add")
+        {
+            int x,v;
+            cin>>x>>v;
+            uf.addExperience(x,v);
+        }
+        else
+        {
+            int x;
+            cin>>x;
+            int ex=uf.totalExperience(x);
+            cout<<ex<<endl;
+        }
+    }
+    return 0;
+}
