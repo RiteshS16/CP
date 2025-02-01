@@ -1,0 +1,83 @@
+//Topological Sorting
+//Problem : https://codeforces.com/contest/510/problem/C
+#include<bits/stdc++.h>
+using namespace std;
+bool dfs(vector<vector<int>>&adj,vector<char>&toposort,vector<int>&visited,vector<int>&pathvisited,int node)
+{
+    visited[node]=1;
+    pathvisited[node]=1;
+    bool ans=true;
+    for(int i=0;i<adj[node].size();i++)
+    {
+        if(visited[adj[node][i]]==0)
+        ans=(ans && dfs(adj,toposort,visited,pathvisited,adj[node][i]));
+        if(visited[adj[node][i]]==1 && pathvisited[adj[node][i]]==1)
+        return false;
+    }
+    toposort.push_back(node);
+    pathvisited[node]=0;
+    return ans;
+}
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    
+    int n;
+    cin>>n;
+    vector<string> name;
+    for(int i=0;i<n;i++)
+    {
+        string s;
+        cin>>s;
+        name.push_back(s);
+    }
+    vector<vector<int>> adj(26);
+    bool ans=true;
+    for(int i=0;i<n-1;i++)
+    {
+        for(int j=0;j<name[i].length();j++)
+        {
+            if(j==name[i+1].length())
+            {
+                ans=false;break;
+            }
+            if(name[i][j]!=name[i+1][j])
+            {
+                adj[name[i][j]-'a'].push_back(name[i+1][j]-'a');
+                break;
+            }
+        }
+        if(!ans)break;
+    }
+    vector<char> toposort;
+    vector<int> visited(26,0),pathvisited(26,0);
+    
+    for(int i=0;i<26;i++)
+    {
+        if(visited[i]==0 && adj[i].size())
+        ans= ans && dfs(adj,toposort,visited,pathvisited,i);
+    }
+    if(!ans)
+    cout<<"Impossible"<<endl;
+    else
+    {
+        vector<int> remain(26,1);
+     
+        reverse(toposort.begin(),toposort.end());
+        for(int i=0;i<toposort.size();i++)
+        {
+            cout<<char(toposort[i]+'a');
+            remain[toposort[i]]=0;
+        }
+        for(int i=0;i<26;i++)
+        {
+            if(remain[i]==1)
+            cout<<char(i+'a');
+        }
+        cout<<endl;
+    }
+    
+    return 0;
+}
