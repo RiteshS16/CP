@@ -1,0 +1,93 @@
+//Krukshal's Algo for MST
+//Question: https://www.spoj.com/problems/ULM09/
+#include<bits/stdc++.h>
+using namespace std;
+class UnionFind{
+    private: vector<int> p,rank;
+    public:
+    UnionFind(int n)
+    {
+        p.resize(n,0);
+        rank.resize(n,0);
+        for(int i=0;i<n;i++)
+        p[i]=i;
+    }
+    int find_set(int v)
+    {
+        if(p[v]==v)
+        return v;
+        return p[v]=find_set(p[v]);
+    }
+    void union_set(int u,int v)
+    {
+        if(find_set(u)!=find_set(v))
+        {
+            u=find_set(u);
+            v=find_set(v);
+            if(rank[u]>rank[v])
+            p[v]=u;
+            else
+            {
+                p[u]=v;
+                if(rank[u]==rank[v])
+                rank[v]++;
+            }
+        }
+        return;
+    }
+    void reset(int n)
+    {
+        p.clear();
+        p.resize(n,0);
+        for(int i=0;i<n;i++)
+        p[i]=i;
+        rank.clear();
+        rank.resize(n,0);
+    }
+};
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    vector<long long> ans;
+    while(true)
+    {
+        int m,n;
+        cin>>m>>n;
+        if(m==0 && n==0)
+        break;
+        long long totalCost=0;
+        UnionFind uf(m);
+        set<pair<int,pair<int,int>>> q; 
+        for(int i=1;i<=n;i++)
+        {
+            int u,v,w;
+            cin>>u>>v>>w;
+            totalCost+=w;
+            q.insert({w,{u,v}});
+        }
+        long long cost=0;
+        while(!q.empty())
+        {
+            auto p=(*q.begin());
+            q.erase(q.begin());
+            
+            int w=p.first;
+            int u=p.second.first;
+            int v=p.second.second;
+            
+            if(uf.find_set(u)==uf.find_set(v))
+            continue;
+            
+            cost+=w;
+            uf.union_set(u,v);
+        }
+        ans.push_back(totalCost-cost);
+    }
+    for(int i=0;i<ans.size();i++)
+    cout<<ans[i]<<endl;
+    
+    return 0;
+}
