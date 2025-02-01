@@ -1,0 +1,71 @@
+//DSU Implementation
+#include<bits/stdc++.h>
+using namespace std;
+class UnionFind{
+  private:   vector<int> p,rank;
+  public:
+  UnionFind(int n)
+  {
+      p.resize(n,0);
+      rank.resize(n,0);
+      for(int i=0;i<n;i++)
+      p[i]=i;
+  }
+  
+  int find_set(int v)
+  {
+      if(v==p[v])
+      return v;
+      
+      return p[v]=find_set(p[v]);
+  }
+  void union_set(int x,int y)
+  {
+      if(find_set(x)!=find_set(y))
+      {
+          x=find_set(x);
+          y=find_set(y);
+          if(rank[x]>rank[y])
+          p[y]=x;
+          else
+          {
+              p[x]=y;
+              if(rank[y]==rank[x])
+                  rank[y]++;
+          }
+      }
+  }
+  
+};
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    
+    int n,m;
+    cin>>n>>m;
+    UnionFind uf(n+1);
+    for(int i=0;i<m;i++)
+    {
+        string s;
+        cin>>s;
+        if(s=="union")
+        {
+            int x,y;
+            cin>>x>>y;
+            uf.union_set(x,y);
+        }
+        else
+        {
+            int x,y;
+            cin>>x>>y;
+            if(uf.find_set(x)==uf.find_set(y))
+            cout<<"YES"<<endl;
+            else
+            cout<<"NO"<<endl;
+        }
+    }
+    
+    return 0;
+}
