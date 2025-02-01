@@ -1,0 +1,76 @@
+//PRIM's Algo Implementation to find Minimum Spanning Tree
+//Question: https://www.spoj.com/problems/ULM09/
+
+#include<bits/stdc++.h>
+using namespace std;
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    vector<long long> ans;
+    while(true)
+    {
+        int m,n;
+        cin>>m>>n;
+        if(m==0 && n==0)
+        break;
+        long long totalCost=0;
+        vector<vector<pair<int,int>>> adj(m);
+        for(int i=1;i<=n;i++)
+        {
+            int u,v,w;
+            cin>>u>>v>>w;
+            totalCost+=w;
+            adj[u].push_back({v,w});
+            adj[v].push_back({u,w});
+        }
+        long long INF=1e16;
+        vector<long long> dist(m,INF);
+        dist[0]=0;
+        set<pair<long long,int>> q;
+        q.insert({0,0});
+        vector<int> visited(n,0);
+        int added=0;
+        long long min_cost=0;
+        
+        //Condition in Dijkstra is while(!q.empty())
+        while(added<m)
+        {
+            if(q.empty()) break;
+            auto p=(*q.begin());
+            q.erase(q.begin());
+            int d=p.first;
+            int nd=p.second;
+            
+            //Extra condition not in Dijkstra
+            if(dist[nd]<d)
+            continue;
+            added++;
+            
+            //There is no visited array in Dijkstra
+            visited[nd]=1;
+            min_cost+=d;
+            for(int i=0;i<adj[nd].size();i++)
+            {
+                
+                //In Dijkstra algo we check if dist[adjNode]> d + adj[nd][i].second.
+                //But in Prim's, as we store only the edge weights and not the sum from
+                //source to adjNode, we just store the edge weights. Hence dist[adjNode] stores only
+                //the edge weights and therefore in the if condition we are just checking
+                //if dist[adjNode] > curr edge weight ie adj[nd][i].second.
+                if(visited[adj[nd][i].first]==0 && dist[adj[nd][i].first]>adj[nd][i].second)
+                {
+                    q.erase({dist[adj[nd][i].first],adj[nd][i].first});
+                    dist[adj[nd][i].first]=adj[nd][i].second;
+                    q.insert({dist[adj[nd][i].first],adj[nd][i].first});
+                }
+            }
+        }
+        ans.push_back(totalCost-min_cost);
+    }
+    for(int i=0;i<ans.size();i++)
+    cout<<ans[i]<<endl;
+    
+    return 0;
+}
