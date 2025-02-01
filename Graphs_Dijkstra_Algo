@@ -1,0 +1,62 @@
+//Dijkstra Algo
+#include<bits/stdc++.h>
+using namespace std;
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int n,m;
+    cin>>n>>m;
+    vector<vector<pair<int,int>>> adj(n+1);
+    for(int i=1;i<=m;i++)
+    {
+        int u,v,w;
+        cin>>u>>v>>w;
+        adj[u].push_back({v,w});
+        adj[v].push_back({u,w});
+    }
+    long long INF=1e15;
+    vector<pair<long long,int>> dist(n+1,{INF,-1});
+    dist[1].first=0;
+    set<pair<long long,int>> q;
+    q.insert({0,1});
+    while(!q.empty())
+    {
+        auto p=(*q.begin());
+        int nd=p.second;
+        long long wt=p.first;
+        q.erase(q.begin());
+        for(int i=0;i<adj[nd].size();i++)
+        {
+            int adjNode=adj[nd][i].first;
+            long long adjWt=adj[nd][i].second;
+            if(dist[adjNode].first > adjWt +wt)
+            {
+                q.erase({dist[adjNode].first,adjNode});
+                dist[adjNode].first=adjWt+wt;
+                dist[adjNode].second=nd;
+                q.insert({dist[adjNode].first,adjNode});
+            }
+        }
+    }
+    if(dist[n].first==1e15)
+    cout<<-1<<endl;
+    else
+    {
+        vector<int> path;
+        path.push_back(n);
+        int pr=dist[n].second;
+        while(pr!=-1)
+        {
+            path.push_back(pr);
+            pr=dist[pr].second;
+        }
+        reverse(path.begin(),path.end());
+        for(int i=0;i<path.size();i++)
+        cout<<path[i]<<" ";
+        cout<<endl;
+    }
+    return 0;
+}
