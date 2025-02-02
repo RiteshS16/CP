@@ -1,0 +1,85 @@
+//Topo sort done using both DFS and Khan's algo. But DFS was giving runtime/TLE hence implemented using Khan Algo
+#include<bits/stdc++.h>
+using namespace std;
+// bool dfs(vector<vector<int>> adj,vector<int> &visited,vector<int>&pathvisited,vector<int> & topo, int node)
+// {
+//     visited[node]=1;
+//     pathvisited[node]=1;
+//     bool ans=true;
+//     for(int i=0;i<adj[node].size();i++)
+//     {
+//         if(visited[adj[node][i]]==0)
+//         ans = ans && dfs(adj,visited,pathvisited,topo,adj[node][i]);
+//         if(visited[adj[node][i]]==1 && pathvisited[adj[node][i]]==1)
+//         return false;
+//     }
+//     pathvisited[node]=0;
+//     topo.push_back(node);
+//     return ans;
+// }
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    
+    int n,m;
+    cin>>n>>m;
+    vector<vector<int>> adj(n+1);
+    vector<int> indegree(n+1,0);
+    for(int i=1;i<=m;i++)
+    {
+        int a,b;
+        cin>>a>>b;
+        adj[a].push_back(b);
+        indegree[b]++;
+    }
+    queue<int> q;
+    for(int i=1;i<=n;i++)
+    {
+        if(indegree[i]==0)
+        q.push(i);
+    }
+    vector<int> topo;
+    while(!q.empty())
+    {
+        int nd=q.front();
+        q.pop();
+        topo.push_back(nd);
+        for(int i=0;i<adj[nd].size();i++)
+        {
+            indegree[adj[nd][i]]--;
+            if(indegree[adj[nd][i]]==0)
+            q.push(adj[nd][i]);
+        }
+    }
+    if(topo.size()!=n)
+    cout<<"IMPOSSIBLE"<<endl;
+    else
+    {
+        for(int i=0;i<topo.size();i++)
+        cout<<topo[i]<<" ";
+        cout<<endl;
+    }
+    
+    //DFS code
+    // vector<int> visited(n+1,0),pathvisited(n+1,0);
+    // vector<int> topo;
+    // bool ans=true;
+    // for(int i=1;i<=n;i++)
+    // {
+    //     if(!visited[i])
+    //     ans= ans && dfs(adj,visited,pathvisited,topo,i);
+    // }
+    // if(ans==false)
+    // cout<<"IMPOSSIBLE"<<endl;
+    // else
+    // {
+    //     reverse(topo.begin(),topo.end());
+    //     for(int i=0;i<topo.size();i++)
+    //     cout<<topo[i]<<" ";
+    //     cout<<endl;
+    // }
+    
+    return 0;
+}
