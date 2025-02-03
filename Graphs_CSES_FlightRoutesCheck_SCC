@@ -1,0 +1,98 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+void toposort(vector<vector<int>>&adj,vector<int>&topo,int node,vector<int>&visited)
+{
+    visited[node]=1;
+    for(int i=0;i<adj[node].size();i++)
+    {
+        if(visited[adj[node][i]]==0)
+        toposort(adj,topo,adj[node][i],visited);
+    }
+    topo.push_back(node);
+    return;
+}
+void getComponent(vector<vector<int>> &revAdj,int node,vector<int> &comp,vector<int>&visited)
+{
+    visited[node]=1;
+    comp.push_back(node);
+    for(int i=0;i<revAdj[node].size();i++)
+    {
+        if(visited[revAdj[node][i]]==0)
+        getComponent(revAdj,revAdj[node][i],comp,visited);
+    }
+    return ;
+}
+vector<vector<int>> getScc(vector<vector<int>>&adj,vector<vector<int>>&revAdj)
+{
+    int n=adj.size();
+    vector<int> topo;
+    
+    vector<int> visited(n,0);
+    for(int i=1;i<n;i++)
+    {
+        if(visited[i]==0)
+        toposort(adj,topo,i,visited);
+    }
+    vector<vector<int>> scc;
+    visited.clear();
+    visited.resize(n,0);
+    for(int i=topo.size()-1;i>=0;i--)
+    {
+        vector<int> comp;
+        if(visited[topo[i]]==0)
+        {
+            getComponent(revAdj,topo[i],comp,visited);
+            scc.push_back(comp);
+        }
+        
+        
+    }
+    
+    return scc;
+}
+
+void dfs(vector<vector<int>>&adj,vector<int>&visited,int node)
+{
+    visited[node]=1;
+    for(int i=0;i<adj[node].size();i++)
+    {
+        if(visited[adj[node][i]]==0)
+        dfs(adj,visited,adj[node][i]);
+    }
+    return;
+}
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    
+    int n,m;
+    cin>>n>>m;
+    vector<vector<int>> adj(n+1),revAdj(n+1);
+    for(int i=1;i<=m;i++)
+    {
+        int a,b;
+        cin>>a>>b;
+        adj[a].push_back(b);
+        revAdj[b].push_back(a);
+    }
+    vector<int> visited(n+1,0);
+    vector<vector<int>> scc=getScc(adj,revAdj);
+    int ans=0;
+    if(scc.size()==1)
+    cout<<"YES"<<endl;
+    else
+    {
+        cout<<"NO"<<endl;
+        vector<int> visited(n+1,0);
+        //DFS call to check if it is possible to go from scc[0][0] to scc[1][0] or vice versa
+        dfs(adj,visited,scc[0][0]);
+        if(visited[scc[1][0]]==1)
+        cout<<scc[1][0]<<" "<<scc[0][0]<<endl;
+        else
+        cout<<scc[0][0]<<" "<<scc[1][0]<<endl;
+    }
+    return 0;
+}
