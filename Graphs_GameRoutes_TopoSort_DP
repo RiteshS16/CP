@@ -1,0 +1,45 @@
+#include<bits/stdc++.h>
+using namespace std;
+void dfs(vector<vector<int>>&adj,vector<int>&visited,int node,vector<int>&topo)
+{
+    visited[node]=1;
+    for(int i=0;i<adj[node].size();i++)
+    {
+        if(visited[adj[node][i]]==0)
+        dfs(adj,visited,adj[node][i],topo);
+    }
+    topo.push_back(node);
+    return ;
+}
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int n,m;
+    cin>>n>>m;
+    vector<vector<int>> adj(n+1);
+    for(int i=1;i<=m;i++)
+    {
+        int a,b;
+        cin>>a>>b;
+        adj[a].push_back(b);
+    }
+    vector<long long> noOfWays(n+1,0);
+    noOfWays[1]=1;
+    vector<int> visited(n+1,0);
+    vector<int> topo;
+    dfs(adj,visited,1,topo);
+    reverse(topo.begin(),topo.end());
+    int mod=1e9+7;
+    for(int i=0;i<topo.size();i++)
+    {
+        for(int j=0;j<adj[topo[i]].size();j++)
+        {
+            noOfWays[adj[topo[i]][j]]+=noOfWays[topo[i]];
+            noOfWays[adj[topo[i]][j]]%=mod;
+        }
+    }
+    cout<<noOfWays[n]<<endl;
+    return 0;
+}
