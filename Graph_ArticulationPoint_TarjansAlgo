@@ -1,0 +1,117 @@
+//{ Driver Code Starts
+//Initial Template for C++
+
+#include<bits/stdc++.h>
+using namespace std;
+
+// } Driver Code Ends
+//User function Template for C++
+
+class Solution {
+  public:
+    void dfs(int node,int parent,vector<int> adj[],
+    vector<int> &visited,vector<int> &tin,vector<int> &low,
+    vector<int> &mark,int &timer)
+    {
+        visited[node]=1;
+        tin[node]=timer;
+        low[node]=timer;
+        timer++;
+        
+        //To check if parent is an articulation point
+        int child=0;
+        
+        for(int i=0;i<adj[node].size();i++)
+        {
+            if(adj[node][i]==parent) continue;
+            
+            if(visited[adj[node][i]]==0)
+            {
+                dfs(adj[node][i],node,adj,visited,tin,low,mark,timer);
+                
+                low[node]=min(low[node],low[adj[node][i]]);
+               
+                //Slightly different from bridges in graph logic
+                //we are not checking if parent is an articulation point
+                //here. We will check separately for parent.
+                if(low[adj[node][i]]>=tin[node] && parent!=-1)
+                mark[node]=1;
+                
+                child++;
+            }
+            else
+            {
+                //Slightly different from Brdiges in Graph code.
+                //Here we are finding minmin(low[node],tin[adj[node][i]]);
+                //and not min(low[node],low[adj[node][i]]), like in brideges
+                //in graph problem. 
+                //Why? Because Suppose if adj[node][i] is the articulation 
+                //point, then removing it will make it impossible for 
+                //all the nodes below it to reach on the nodes
+                //above it. But if I mark 
+                //low[node] = min(mow[node],low[adj[node][i]]), then 
+                //low[node] might take the value of low[adj[node][i]]
+                //which could be above adj[node][i], but as we know
+                //removing adj node will make it impossible for node to 
+                //reach any node before it, hence our this logic of
+                //low[node]=min(low[node],low[adj[node][i]]) will come out 
+                //to be wrong.
+                low[node]=min(low[node],tin[adj[node][i]]);
+            }
+        }
+        
+        if(child>1 && parent==-1)
+        mark[node]=1;
+        
+        return ;
+    }
+    vector<int> articulationPoints(int n, vector<int>adj[]) {
+        vector<int> visited(n,0);
+        
+        //mark-> to mark all the articulation points
+        vector<int> tin(n,0),low(n,0),mark(n,0);
+        int timer=0;
+        for(int i=0;i<n;i++)
+        {
+            if(visited[i]==0)
+            dfs(i,-1,adj,visited,tin,low,mark,timer);
+        }
+        
+        vector<int> ans;
+        for(int i=0;i<n;i++)
+        {
+            if(mark[i]==1)
+            ans.push_back(i);
+        }
+        
+        if(ans.size()==0) return {-1};
+        
+        return ans;
+    }
+};
+
+//{ Driver Code Starts.
+
+int main(){
+	int tc;
+	cin >> tc;
+	while(tc--){
+		int V, E;
+		cin >> V >> E;
+		vector<int>adj[V];
+		for(int i = 0; i < E; i++){
+			int u, v;
+			cin >> u >> v;
+			adj[u].push_back(v);
+			adj[v].push_back(u);
+		}
+		Solution obj;
+		vector<int> ans = obj.articulationPoints(V, adj);
+		for(auto i: ans)cout << i << " ";
+		cout << "\n";
+	
+cout << "~" << "\n";
+}
+	return 0;
+}
+// } Driver Code Ends
