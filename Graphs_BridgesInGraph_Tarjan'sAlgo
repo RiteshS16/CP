@@ -1,0 +1,59 @@
+class Solution {
+public:
+    void dfs(int node,int parent,vector<vector<int>>&adj,
+    vector<vector<int>>&bridges,vector<int>&visited,
+    vector<int>&tin,vector<int>&low,int &timer)
+    {
+        visited[node]=1;
+        tin[node]=timer;
+        low[node]=timer;
+        timer++;
+        for(int i=0;i<adj[node].size();i++)
+        {
+            if(adj[node][i]==parent) continue;
+            else if(visited[adj[node][i]]==0)
+            {
+                dfs(adj[node][i],node,adj,bridges,visited,tin,low,timer);
+
+                //updating low[node] by comparing it with low of adj nodes
+                low[node]=min(low[node],low[adj[node][i]]);
+
+                //if low[adj node] is > time of insertion of node, then the edge (node---adjNode) is the only path connecting
+                //both of them hence, edge[node,adjNode] is a bridge.
+                if(low[adj[node][i]]>tin[node])
+                bridges.push_back({adj[node][i],node});
+            }
+            else
+            {
+                //If adjNode is already visited then we for sure know that another path exists to reach adjNode.
+                //Hence, we will only update out low[node] value from the adjNode.
+                low[node]=min(low[node],low[adj[node][i]]);
+            }
+        }
+        return ;
+    }
+    vector<vector<int>> criticalConnections(int n, vector<vector<int>>& connections) {
+        vector<vector<int>> adj(n);
+        for(int i=0;i<connections.size();i++)
+        {
+            int u=connections[i][0];
+            int v=connections[i][1];
+            adj[u].push_back(v);
+            adj[v].push_back(u);
+        }
+
+        //To keep track of time of insertion of a node.
+        int timer=0;
+
+        vector<int> visited(n,0);
+
+        //stores the bridges in the graph
+        vector<vector<int>> bridges;
+
+        //tin[node]->time of insertion of node into the call stack
+        //low[node]-> minimum(low[node],low[all adj Nodes] except parent)
+        vector<int> tin(n,0),low(n,0);
+        dfs(0,-1,adj,bridges,visited,tin,low,timer);
+        return bridges;
+    }
+};
