@@ -69,7 +69,11 @@ class Solution {
         vector<int> visited(n,0);
         
         //mark-> to mark all the articulation points
+	//tin[node]->time of insertion of node into the call stack
+        //low[node]-> minimum(low[node],low[all adj Nodes] except parent)
         vector<int> tin(n,0),low(n,0),mark(n,0);
+
+	//To keep track of time of insertion of a node.
         int timer=0;
         for(int i=0;i<n;i++)
         {
