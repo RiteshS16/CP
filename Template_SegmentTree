@@ -1,0 +1,87 @@
+//Find min in the range CSES
+#include <bits/stdc++.h>
+using namespace std;
+void build(int start,int end,int index,vector<int> &seg,vector<int> &arr)
+{
+    if(start==end)
+    {
+        seg[index]=arr[start];
+        return;
+    }
+    
+    int mid=(start+end)/2;
+    build(start,mid,2*index,seg,arr);
+    build(mid+1,end,2*index+1,seg,arr);
+    seg[index]=min(seg[2*index],seg[2*index+1]);
+    
+    return;
+}
+void update(int start,int end, int index, int pos,int val,vector<int> &seg,vector<int> &arr)
+{
+    int s=start,e=end;
+    if(start==end)
+    {
+        seg[index]=val;
+        return;
+    }
+    
+    int mid=(start+end)/2;
+    
+    if(pos<=mid)
+    update(start,mid,2*index,pos,val,seg,arr);
+    else
+    update(mid+1,end,2*index+1,pos,val,seg,arr);
+    
+    seg[index]=min(seg[2*index],seg[2*index+1]);
+    
+    return;
+}
+int query(int start,int end,int index,int left, int right,vector<int> &seg,vector<int> &arr)
+{
+    int INF=1e9+10;
+    
+    if(left>end || right<start)
+    return INF;
+    
+    if(left<=start && right>=end)
+    return seg[index];
+    
+    int mid=(start+end)/2;
+    
+    int leftVal=query(start,mid,2*index,left,right,seg,arr);
+    int rightVal=query(mid+1,end,2*index+1,left,right,seg,arr);
+    
+    return min(leftVal,rightVal);
+}
+
+int main() {
+    
+        int n,q;
+        cin>>n>>q;
+        vector<int> seg(4*n);
+        vector<int> x(n);
+        for(int i=0;i<n;i++)
+        cin>>x[i];
+        
+        build(0,n-1,1,seg,x);
+        
+        for(int i=0;i<q;i++)
+        {
+            int type;
+            cin>>type;
+            if(type==1)
+            {
+                int pos,val;
+                cin>>pos>>val;
+                update(0,n-1,1,pos-1,val,seg,x);
+            }
+            else
+            {
+                int a,b;
+                cin>>a>>b;
+                int ans=query(0,n-1,1,a-1,b-1,seg,x);
+                cout<<ans<<endl;
+            }
+        }
+    return 0;
+}
