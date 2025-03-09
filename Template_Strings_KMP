@@ -1,0 +1,59 @@
+class Solution {
+public:
+
+    //lps==Longest Proper Prefix which is also a suffix.
+
+  
+    void LPS(vector<int> &lps,string & pattern)
+    {
+        //value of len holds the length of the prefix which is also a suffix
+        int len=0;
+        for(int i=1;i<pattern.length();)
+        {
+            if(pattern[len]==pattern[i])
+            {
+                lps[i]=len+1;
+                len++;i++;
+            }
+            else
+            {
+                if(len!=0)
+                len=lps[len-1];
+                else
+                {
+                    lps[i]=0;
+                    i++;
+                }
+            }
+        }
+    }
+    int KMP(vector<int>&lps,string &text,string &pattern)
+    {
+        for(int i=0,j=0;j<pattern.length()&&i<text.length();)
+        {
+            if(text[i]==pattern[j])
+            {
+                i++;j++;
+
+                //first index where pattern == text
+                if(j==pattern.length())
+                return i-pattern.length();
+            }
+            else
+            {
+                if(j!=0)
+                j=lps[j-1];
+                else
+                i++;
+            }
+        }
+        return -1;
+    }
+    int strStr(string haystack, string needle) {
+        vector<int> lps(needle.size(),0);
+        LPS(lps,needle);
+
+        int ans=KMP(lps,haystack,needle);
+        return ans;
+    }
+};
